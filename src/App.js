@@ -1,6 +1,18 @@
 import logo from './logo.svg';
 import './App.css';
+import { ref, child, get } from "firebase/database";
+import { database } from './firebaseConfig';
 
+const dbRef = ref(database);
+get(child(dbRef, `uses`)).then((snapshot) => {
+  if (snapshot.exists()) {
+    console.log(snapshot.val());
+  } else {
+    console.log("No data available");
+  }
+}).catch((error) => {
+  console.error(error);
+});
 function App() {
   return (
     <div className="App">

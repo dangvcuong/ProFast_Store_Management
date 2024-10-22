@@ -1,15 +1,11 @@
-// Import the functions you need from the SDKs you need
+// firebaseConfig.js
 import { initializeApp } from "firebase/app";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries\
-import { getAnalytics } from "firebase/analytics";
 import { getDatabase } from "firebase/database";
-
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+// Firebase configuration
 const firebaseConfig = {
     apiKey: "AIzaSyBtZ1vhjaQHS-FZA4VfS4vZYHu9X6_9PFk",
     authDomain: "profast-e9fdf.firebaseapp.com",
+    databaseURL: "https://profast-e9fdf-default-rtdb.firebaseio.com",
     projectId: "profast-e9fdf",
     storageBucket: "profast-e9fdf.appspot.com",
     messagingSenderId: "1053567433900",
@@ -19,6 +15,5 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
-const database = getDatabase(app);
-export { analytics, database };
+const db = getDatabase(app);
+export { db, app };

@@ -1,0 +1,64 @@
+/* Định dạng cho toàn bộ form */
+input {
+    width: 200px;
+    /* Đặt độ rộng cho các input */
+    padding: 8px;
+    margin-right: 10px;
+    /* Khoảng cách giữa các input */
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+/* Nút bấm */
+button {
+    padding: 10px 20px;
+    background-color: #4CAF50;
+    /* Màu nền */
+    color: white;
+    /* Màu chữ */
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    margin-right: 10px;
+}
+
+button:disabled {
+    background-color: #ccc;
+    /* Màu nền cho nút bị vô hiệu hóa */
+    cursor: not-allowed;
+}
+
+button:hover {
+    background-color: #45a049;
+    /* Màu khi hover */
+}
+
+/* Căn chỉnh bảng */
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th,
+td {
+    padding: 12px;
+    text-align: center;
+    border-bottom: 1px solid #ddd;
+}
+
+/* Tiêu đề bảng */
+th {
+    background-color: #f2f2f2;
+    color: black;
+}
+
+/* Tạo khoảng cách giữa các phần */
+.container {
+    margin-top: 20px;
+}
+
+h1 {
+    margin-bottom: 20px;
+}

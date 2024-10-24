@@ -2,9 +2,10 @@ import { ref, set, push, get, child, remove } from "firebase/database";
 import { db } from '../firebaseConfig'; // Import Firebase Database từ file cấu hình
 
 class Employee {
-    constructor(id, email, password, name, status, phoneNumber, position, createdDate) {
+    constructor(id, email, username, password, name, status, phoneNumber, position, createdDate) {
         this.id = id;
         this.email = email;
+        this.username = username;
         this.password = password;
         this.name = name;
         this.status = status;

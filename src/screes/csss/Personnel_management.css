@@ -62,3 +62,12 @@ th {
 h1 {
     margin-bottom: 20px;
 }
+
+.table-container {
+    max-height: 400px;
+    /* Chiều cao tối đa của bảng */
+    overflow-y: auto;
+    /* Bật cuộn dọc */
+    border: 1px solid #ccc;
+    /* Tùy chọn: thêm viền để nhìn rõ */
+}

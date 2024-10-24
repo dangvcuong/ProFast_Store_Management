@@ -1,6 +1,8 @@
 // firebaseConfig.js
 import { initializeApp } from "firebase/app";
 import { getDatabase } from "firebase/database";
+import { getStorage } from "firebase/storage"; // Import Firebase Storage
+
 // Firebase configuration
 const firebaseConfig = {
     apiKey: "AIzaSyBtZ1vhjaQHS-FZA4VfS4vZYHu9X6_9PFk",
@@ -16,4 +18,6 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
-export { db, app };
+const storage = getStorage(app); // Khởi tạo Firebase Storage
+
+export { db, storage, app }; // Export Storage để sử dụng trong các tệp khác

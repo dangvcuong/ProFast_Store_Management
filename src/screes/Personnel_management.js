@@ -8,6 +8,7 @@ const Personnel_management = () => {
     const [id, setId] = useState('');
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
+    const [username, setuserName] = useState('');
     const [password, setPassword] = useState('');
     const [status, setStatus] = useState('');
     const [phoneNumber, setPhoneNumber] = useState('');
@@ -24,24 +25,24 @@ const Personnel_management = () => {
     };
 
     const handleAdd = async () => {
-        if (!name || !email || !password || !status || !phoneNumber || !position) {
+        if (!name || !email || !password || !status || !phoneNumber || !position || !username) {
             alert('Vui lòng nhập đầy đủ thông tin');
             return;
         }
 
-        const employee = { name, email, password, status, phoneNumber, position };
+        const employee = { name, email, username, password, status, phoneNumber, position };
         await addEmployee(employee);
         loadEmployees();
         resetForm();
     };
 
     const handleUpdate = async () => {
-        if (!id || !name || !email || !password || !status || !phoneNumber || !position) {
+        if (!id || !name || !email || !password || !status || !phoneNumber || !position || !username) {
             alert('Vui lòng nhập đầy đủ thông tin');
             return;
         }
 
-        const employee = { id, name, email, password, status, phoneNumber, position, createdDate };
+        const employee = { id, name, email, username, password, status, phoneNumber, position, createdDate };
         await updateEmployee(employee);
         loadEmployees();
         resetForm();
@@ -51,6 +52,7 @@ const Personnel_management = () => {
         setId(employee.id);
         setName(employee.name);
         setEmail(employee.email);
+        setuserName(employee.username);
         setPassword(employee.password);
         setStatus(employee.status);
         setPhoneNumber(employee.phoneNumber);
@@ -66,6 +68,7 @@ const Personnel_management = () => {
     const resetForm = () => {
         setId('');
         setName('');
+        setuserName("");
         setEmail('');
         setPassword('');
         setStatus('');
@@ -78,11 +81,12 @@ const Personnel_management = () => {
         <div className="container">
             <h1>Quản lý nhân viên</h1>
 
-            <input placeholder="Name" value={name} onChange={(e) => setName(e.target.value)} />
-            <input placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
-            <input placeholder="Password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
-            <input placeholder="Status" value={status} onChange={(e) => setStatus(e.target.value)} />
-            <input placeholder="Phone Number" value={phoneNumber} onChange={(e) => setPhoneNumber(e.target.value)} />
+            <input placeholder="Name" value={name} onChange={(e) => setName(e.target.value)} style={{ marginBottom: '10px' }} />
+            <input placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} style={{ marginBottom: '10px' }} />
+            <input placeholder="Phone Number" value={phoneNumber} onChange={(e) => setPhoneNumber(e.target.value)} style={{ marginBottom: '10px' }} />
+            <input placeholder="UserName" type="username" value={username} onChange={(e) => setuserName(e.target.value)} style={{ marginBottom: '10px' }} />
+            <input placeholder="Password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} style={{ marginBottom: '10px' }} />
+            <input placeholder="Status" value={status} onChange={(e) => setStatus(e.target.value)} style={{ marginBottom: '10px' }} />
             <input placeholder="Position" value={position} onChange={(e) => setPosition(e.target.value)} />
 
             <button onClick={handleAdd}>Thêm</button>
@@ -95,6 +99,7 @@ const Personnel_management = () => {
                         <th>Tên</th>
                         <th>Email</th>
                         <th>Số điện thoại</th>
+                        <th>Tên đăng nhập</th>
                         <th>Ngày tạo</th>
                         <th>Trạng thái</th>
                         <th>Hành động</th>
@@ -106,6 +111,7 @@ const Personnel_management = () => {
                             <td>{employees[key].name}</td>
                             <td>{employees[key].email}</td>
                             <td>{employees[key].phoneNumber}</td>
+                            <td>{employees[key].username}</td>
                             <td>{employees[key].createdDate}</td>
                             <td>{employees[key].status}</td>
                             <td>

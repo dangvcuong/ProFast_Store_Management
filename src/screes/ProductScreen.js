@@ -4,24 +4,26 @@ import { storage } from '../firebaseConfig';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { db } from '../firebaseConfig';
 import { ref as dbRef, onValue } from 'firebase/database';
-import { getCompany } from '../models/Company_Model'; // Hàm lấy danh sách hãng sản phẩm
+import { getCompany } from '../models/Company_Model';
 
 const ProductManagement = () => {
     const [id, setId] = useState('');
     const [products, setProducts] = useState({});
-    const [companies, setCompanies] = useState({}); // State lưu danh sách hãng sản phẩm
+    const [companies, setCompanies] = useState({});
     const [name, setName] = useState('');
     const [price, setPrice] = useState('');
     const [quantity, setQuantity] = useState('');
     const [describe, setDescribe] = useState('');
     const [evaluate, setEvaluate] = useState('');
-    const [id_Hang, setId_Hang] = useState(''); // ID của hãng sản phẩm
+    const [id_Hang, setId_Hang] = useState('');
     const [image, setImage] = useState(null);
     const [imageUrl, setImageUrl] = useState('');
+    const [selectedCompany, setSelectedCompany] = useState('');
+    const [searchTerm, setSearchTerm] = useState('');
 
     useEffect(() => {
         loadProductsRealtime();
-        loadCompanies(); // Gọi hàm tải hãng sản phẩm khi component được render
+        loadCompanies();
     }, []);
 
     const loadProductsRealtime = () => {
@@ -32,19 +34,15 @@ const ProductManagement = () => {
         });
     };
 
-    // Hàm tải danh sách hãng sản phẩm
     const loadCompanies = async () => {
         const companiesData = await getCompany();
         setCompanies(companiesData);
     };
 
     const handleImageChange = (e) => {
-        const selectedFile = e.target.files[0]; // Lấy tệp đã chọn
+        const selectedFile = e.target.files[0];
         if (selectedFile) {
-            console.log("Image selected:", selectedFile); // Kiểm tra ảnh được chọn
-            setImage(selectedFile); // Lưu ảnh vào state
-        } else {
-            console.error("No image selected");
+            setImage(selectedFile);
         }
     };
 
@@ -52,105 +50,91 @@ const ProductManagement = () => {
         try {
             if (image) {
                 const storageRef = ref(storage, `products/${image.name}`);
-                await uploadBytes(storageRef, image); // Tải ảnh lên Firebase Storage
-                const url = await getDownloadURL(storageRef); // Lấy URL của ảnh đã tải lên
+                await uploadBytes(storageRef, image);
+                const url = await getDownloadURL(storageRef);
                 setImageUrl(url);
                 return url;
             }
             return '';
         } catch (error) {
-            console.error("Lỗi khi tải ảnh lên:", error);
-            alert("Lỗi khi tải ảnh lên Firebase Storage. Vui lòng thử lại.");
+            console.error("Error uploading image:", error);
+            alert("Error uploading image to Firebase Storage.");
             return '';
         }
     };
 
     const handleAdd = async () => {
         try {
-            // Kiểm tra xem ảnh đã được chọn chưa
             if (!image) {
-                alert('Vui lòng chọn ảnh sản phẩm');
+                alert('Please select a product image');
                 return;
             }
 
-            // Tải ảnh lên Firebase Storage trước khi thêm sản phẩm
             const uploadedImageUrl = await handleUploadImage();
             if (!uploadedImageUrl) {
-                alert('Lỗi tải ảnh. Vui lòng thử lại.');
+                alert('Image upload error. Please try again.');
                 return;
             }
 
-            // Kiểm tra xem các trường còn lại có đầy đủ không
             if (!name || !price || !quantity || !describe || !evaluate || !id_Hang) {
-                alert('Vui lòng nhập đầy đủ thông tin');
+                alert('Please enter all required information');
                 return;
             }
 
-            // Tạo đối tượng sản phẩm để lưu vào Firebase Database
             const product = {
                 name,
                 price,
                 quantity,
-                dateOfEntry: new Date().toISOString(), // Tự động thêm ngày nhập hiện tại
+                dateOfEntry: new Date().toISOString(),
                 describe,
                 evaluate,
                 id_Hang,
-                imageUrl: uploadedImageUrl // Lưu URL ảnh vào thông tin sản phẩm
+                imageUrl: uploadedImageUrl
             };
 
-            // Gọi hàm thêm sản phẩm và reset form sau khi thêm thành công
             await addProduct(product);
-            resetForm(); // Reset lại form sau khi thêm thành công
-            alert("Sản phẩm đã được thêm thành công!");
+            resetForm();
+            alert("Product added successfully!");
         } catch (error) {
-            console.error("Lỗi khi thêm sản phẩm:", error);
-            alert("Lỗi khi thêm sản phẩm. Vui lòng thử lại.");
+            console.error("Error adding product:", error);
+            alert("Error adding product. Please try again.");
         }
     };
 
-
-
     const handleUpdate = async () => {
-        // Kiểm tra ID sản phẩm cần cập nhật
         if (!id) {
-            alert('Không tìm thấy sản phẩm để cập nhật');
+            alert('Product ID not found for update');
             return;
         }
 
-        // Kiểm tra các trường còn lại
         if (!name || !price || !quantity || !describe || !evaluate || !id_Hang) {
-            alert('Vui lòng nhập đầy đủ thông tin');
+            alert('Please enter all required information');
             return;
         }
 
         try {
-            let uploadedImageUrl = imageUrl; // Nếu không có ảnh mới thì giữ nguyên URL cũ
-
-            // Kiểm tra nếu người dùng có chọn ảnh mới
+            let uploadedImageUrl = imageUrl;
             if (image) {
-                uploadedImageUrl = await handleUploadImage(); // Tải ảnh mới lên Firebase Storage
+                uploadedImageUrl = await handleUploadImage();
                 if (!uploadedImageUrl) {
-                    alert('Lỗi tải ảnh. Vui lòng thử lại.');
+                    alert('Image upload error. Please try again.');
                     return;
                 }
             }
 
-            // Cập nhật sản phẩm
             const product = { id, name, price, quantity, describe, evaluate, id_Hang, imageUrl: uploadedImageUrl };
             await updateProduct(product);
 
-            alert("Cập nhật sản phẩm thành công!");
-            resetForm(); // Reset lại form sau khi cập nhật
+            alert("Product updated successfully!");
+            resetForm();
         } catch (error) {
-            console.error("Lỗi khi cập nhật sản phẩm:", error);
-            alert("Lỗi khi cập nhật sản phẩm. Vui lòng thử lại.");
+            console.error("Error updating product:", error);
+            alert("Error updating product. Please try again.");
         }
     };
 
-
-
     const handleEdit = (product) => {
-        setId(product.id_SanPham); // Sử dụng id_SanPham lấy từ Firebase
+        setId(product.id_SanPham);
         setName(product.name);
         setPrice(product.price);
         setQuantity(product.quantity);
@@ -159,7 +143,6 @@ const ProductManagement = () => {
         setId_Hang(product.id_Hang);
         setImageUrl(product.imageUrl);
     };
-
 
     const handleDelete = async (id_SanPham) => {
         await deleteProduct(id_SanPham);
@@ -176,18 +159,39 @@ const ProductManagement = () => {
         setImageUrl('');
     };
 
+    // Hàm chuyển đổi chuỗi có dấu thành không dấu
+    const removeVietnameseTones = (str) => {
+        return str
+            .normalize("NFD") // Chuẩn hóa chuỗi theo chuẩn Unicode Normalization Form D
+            .replace(/[\u0300-\u036f]/g, "") // Loại bỏ dấu
+            .replace(/đ/g, "d") // Chuyển đổi "đ" thành "d"
+            .replace(/Đ/g, "D"); // Chuyển đổi "Đ" thành "D"
+    };
+
+    const filteredProducts = Object.keys(products).filter((key) => {
+        const product = products[key];
+
+        // Chuyển đổi cả searchTerm và tên sản phẩm sang dạng không dấu
+        const matchesCompany = selectedCompany === '' || product.id_Hang === selectedCompany;
+        const matchesSearchTerm =
+            searchTerm === '' ||
+            removeVietnameseTones(product.name.toLowerCase()).includes(removeVietnameseTones(searchTerm.toLowerCase()));
+
+        return matchesCompany && matchesSearchTerm;
+    });
+
     return (
         <div className="container">
-            <h1>Quản lý sản phẩm</h1>
+            <h1>Product Management</h1>
 
-            <input placeholder="Tên sản phẩm" value={name} onChange={(e) => setName(e.target.value)} style={{ marginBottom: '10px' }} />
-            <input placeholder="Giá" type="number" value={price} onChange={(e) => setPrice(e.target.value)} style={{ marginBottom: '10px' }} />
-            <input placeholder="Số lượng" type="number" value={quantity} onChange={(e) => setQuantity(e.target.value)} style={{ marginBottom: '10px' }} />
-            <input placeholder="Mô tả" value={describe} onChange={(e) => setDescribe(e.target.value)} style={{ marginBottom: '10px' }} />
-            <input placeholder="Đánh giá" type="number" value={evaluate} onChange={(e) => setEvaluate(e.target.value)} style={{ marginBottom: '10px' }} />
+            <input placeholder="Product Name" value={name} onChange={(e) => setName(e.target.value)} style={{ marginBottom: '10px' }} />
+            <input placeholder="Price" type="number" value={price} onChange={(e) => setPrice(e.target.value)} style={{ marginBottom: '10px' }} />
+            <input placeholder="Quantity" type="number" value={quantity} onChange={(e) => setQuantity(e.target.value)} style={{ marginBottom: '10px' }} />
+            <input placeholder="Description" value={describe} onChange={(e) => setDescribe(e.target.value)} style={{ marginBottom: '10px' }} />
+            <input placeholder="Rating" type="number" value={evaluate} onChange={(e) => setEvaluate(e.target.value)} style={{ marginBottom: '10px' }} />
 
-            <select value={id_Hang} onChange={(e) => setId_Hang(e.target.value)} style={{ marginBottom: '10px' }}>
-                <option value="">Chọn hãng sản phẩm</option>
+            <select value={id_Hang} onChange={(e) => setId_Hang(e.target.value)} style={{ width: "11%", padding: '8px', fontSize: '12px' }}>
+                <option value="">Chọn hãng</option>
                 {companies && Object.keys(companies).map((key) => (
                     <option key={key} value={key}>
                         {companies[key].name}
@@ -196,30 +200,62 @@ const ProductManagement = () => {
             </select>
 
             <input type="file" onChange={handleImageChange} style={{ marginBottom: '10px' }} />
+            <button onClick={handleAdd}>Add</button>
+            <button onClick={handleUpdate} disabled={!id}>Update</button>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '40px', marginBottom: '20px', }}>
+                <div style={{}}>
+                    <h3>Lọc sản phẩm theo hãng</h3>
+                    <select
+                        value={selectedCompany}
+                        onChange={(e) => setSelectedCompany(e.target.value)}
+                        style={{ width: '100%', padding: '8px', fontSize: '16px' }}
+                    >
+                        <option value="">Tất cả sản phẩm</option>
+                        {companies && Object.keys(companies).map((key) => (
+                            <option key={key} value={key}>
+                                {companies[key].name}
+                            </option>
+                        ))}
+                    </select>
+                </div>
+                <div style={{ flex: 1 }}>
+                    <h3>Tìm kiếm sản phẩm</h3>
+                    <input
+                        placeholder="Nhập tên sản phẩm cần tìm"
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        style={{ width: '50%', padding: '8px', fontSize: '16px' }}
+                    />
+                </div>
+            </div>
 
-            <button onClick={handleAdd}>Thêm</button>
-            <button onClick={handleUpdate} disabled={!id}>Cập nhật</button>
 
-            <h2>Danh sách sản phẩm</h2>
+
+            <h2>Product List</h2>
             <div className="table-container">
                 <table>
                     <thead>
                         <tr>
-                            <th>Hình ảnh</th>
-                            <th>Tên sản phẩm</th>
-                            <th>Giá</th>
-                            <th>Số lượng</th>
-                            <th>Mô tả</th>
-                            <th>Hãng sản phẩm</th>
-                            <th>Đánh giá</th>
-                            <th>Hành động</th>
+                            <th>Image</th>
+                            <th>Name</th>
+                            <th>Price</th>
+                            <th>Quantity</th>
+                            <th>Description</th>
+                            <th>Company</th>
+                            <th>Rating</th>
+                            <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {Object.keys(products).map((key) => (
+                        {filteredProducts.map((key) => (
                             <tr key={key}>
                                 <td>
-                                    <img src={products[key].imageUrl} alt="Product" style={{ width: '100px', height: '100px' }} onError={(e) => e.target.src = "https://via.placeholder.com/50"} />
+                                    <img
+                                        src={products[key].imageUrl}
+                                        alt="Product"
+                                        style={{ width: '100px', height: '100px' }}
+                                        onError={(e) => e.target.src = "https://via.placeholder.com/50"}
+                                    />
                                 </td>
                                 <td>{products[key].name}</td>
                                 <td>{products[key].price}</td>
@@ -228,8 +264,8 @@ const ProductManagement = () => {
                                 <td>{companies[products[key].id_Hang]?.name || 'N/A'}</td>
                                 <td>{products[key].evaluate}</td>
                                 <td>
-                                    <button onClick={() => handleDelete(products[key].id_SanPham)}>Xóa</button>
-                                    <button onClick={() => handleEdit(products[key])}>Sửa</button>
+                                    <button onClick={() => handleDelete(products[key].id_SanPham)}>Delete</button>
+                                    <button onClick={() => handleEdit(products[key])}>Edit</button>
                                 </td>
                             </tr>
                         ))}
@@ -237,7 +273,6 @@ const ProductManagement = () => {
                 </table>
             </div>
         </div>
-
     );
 };
 

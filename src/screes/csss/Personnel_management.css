@@ -64,7 +64,7 @@ h1 {
 }
 
 .table-container {
-    max-height: 400px;
+    max-height: 390px;
     /* Chiều cao tối đa của bảng */
     overflow-y: auto;
     /* Bật cuộn dọc */

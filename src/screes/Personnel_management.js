@@ -14,6 +14,7 @@ const Personnel_management = () => {
     const [phoneNumber, setPhoneNumber] = useState('');
     const [position, setPosition] = useState('');
     const [createdDate, setCreatedDate] = useState('');
+    const [searchTerm, setSearchTerm] = useState(''); // Từ khóa tìm kiếm hãng
 
     useEffect(() => {
         loadEmployees();
@@ -77,6 +78,21 @@ const Personnel_management = () => {
         setCreatedDate('');
     };
 
+    // Hàm chuyển đổi chuỗi có dấu thành không dấu (dùng cho tìm kiếm không phân biệt dấu)
+    const removeVietnameseTones = (str) => {
+        return str
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "")
+            .replace(/đ/g, "d")
+            .replace(/Đ/g, "D");
+    };
+
+    // Lọc danh sách hãng dựa trên từ khóa tìm kiếm (không phân biệt dấu)
+    const filterEdemployees = Object.keys(employees).filter((key) => {
+        const employeesName = employees[key].name;
+        return removeVietnameseTones(employeesName.toLowerCase()).includes(removeVietnameseTones(searchTerm.toLowerCase()));
+    });
+
     return (
         <div className="container">
             <h1>Quản lý nhân viên</h1>
@@ -93,35 +109,45 @@ const Personnel_management = () => {
             <button onClick={handleUpdate} disabled={!id}>Cập nhật</button>
 
             <h2>Danh sách nhân viên</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Tên</th>
-                        <th>Email</th>
-                        <th>Số điện thoại</th>
-                        <th>Tên đăng nhập</th>
-                        <th>Ngày tạo</th>
-                        <th>Trạng thái</th>
-                        <th>Hành động</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {Object.keys(employees).map((key) => (
-                        <tr key={key}>
-                            <td>{employees[key].name}</td>
-                            <td>{employees[key].email}</td>
-                            <td>{employees[key].phoneNumber}</td>
-                            <td>{employees[key].username}</td>
-                            <td>{employees[key].createdDate}</td>
-                            <td>{employees[key].status}</td>
-                            <td>
-                                <button onClick={() => handleDelete(employees[key].id)}>Xóa</button>
-                                <button onClick={() => handleEdit(employees[key])}>Sửa</button>
-                            </td>
+            <div>
+                <input
+                    placeholder="Nhập tên nhân viên cần tìm"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    style={{ width: '30%', padding: '8px', fontSize: '16px', marginBottom: 30, justifyContent: 'right' }}
+                />
+            </div>
+            <div className="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Tên</th>
+                            <th>Email</th>
+                            <th>Số điện thoại</th>
+                            <th>Tên đăng nhập</th>
+                            <th>Ngày tạo</th>
+                            <th>Trạng thái</th>
+                            <th>Hành động</th>
                         </tr>
-                    ))}
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        {filterEdemployees.map((key) => (
+                            <tr key={key}>
+                                <td>{employees[key].name}</td>
+                                <td>{employees[key].email}</td>
+                                <td>{employees[key].phoneNumber}</td>
+                                <td>{employees[key].username}</td>
+                                <td>{employees[key].createdDate}</td>
+                                <td>{employees[key].status}</td>
+                                <td>
+                                    <button onClick={() => handleDelete(employees[key].id)}>Xóa</button>
+                                    <button onClick={() => handleEdit(employees[key])}>Sửa</button>
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
         </div>
     );
 };

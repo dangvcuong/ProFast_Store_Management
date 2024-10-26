@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, TextInput, TouchableOpacity, Text, StyleSheet, Image } from 'react-native';
+import { View, TextInput, TouchableOpacity, Text, StyleSheet } from 'react-native';
 import { ref, get, query, orderByChild, equalTo } from "firebase/database";
 import { db } from '../firebaseConfig'; // Import từ file cấu hình Firebase
 
@@ -9,7 +9,7 @@ const LoginScreen = ({ onLoginSuccess }) => {
     const [errorMessage, setErrorMessage] = useState(null);
 
     const handleLogin = async (username, password) => {
-        if (username == "" || password == "") {
+        if (username === "" || password === "") {
             alert("Vui lòng nhập đầy đủ thông tin")
         } else {
             try {

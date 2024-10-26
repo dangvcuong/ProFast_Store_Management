@@ -1,9 +1,10 @@
 import { ref, set, push, get, child, remove } from "firebase/database";
 import { db } from '../firebaseConfig'; // Import Firebase Database từ file cấu hình
 class Company {
-    constructor(id, name) {
+    constructor(id, name, dateCreated) {
         this.id = id;
         this.name = name;
+        this.dateCreated = dateCreated;
     }
 }
 // Hàm thêm mới một nhân viên
@@ -40,3 +41,7 @@ export const deleteCompany = async (id) => {
     await remove(dbRef); // Sử dụng remove để xóa dữ liệu
 };
 export default Company;
+
+
+
+

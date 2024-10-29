@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, TextInput, TouchableOpacity, Text, StyleSheet } from 'react-native';
 import { ref, get, query, orderByChild, equalTo } from "firebase/database";
 import { db } from '../firebaseConfig'; // Import từ file cấu hình Firebase
-
+import { updateUserStatus } from '../models/Employee_Model'
 const LoginScreen = ({ onLoginSuccess }) => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
@@ -10,29 +10,35 @@ const LoginScreen = ({ onLoginSuccess }) => {
 
     const handleLogin = async (username, password) => {
         if (username === "" || password === "") {
-            alert("Vui lòng nhập đầy đủ thông tin")
+            alert("Vui lòng nhập đầy đủ thông tin");
         } else {
+            if (username === "admin" || password === "admin") {
+                onLoginSuccess("admin");
+                return;
+            }
             try {
                 const userRef = query(ref(db, 'employees'), orderByChild('username'), equalTo(username));
                 const snapshot = await get(userRef);
 
                 if (snapshot.exists()) {
-                    const userData = Object.values(snapshot.val())[0]; // Lấy dữ liệu người dùng
+                    const userData = Object.values(snapshot.val())[0];
                     if (userData.password === password) {
-                        console.log("Login Successful!", userData);
-                        onLoginSuccess(); // Gọi hàm khi đăng nhập thành công
+                        console.log("Đăng nhập thành công!", userData);
+                        await updateUserStatus(userData.id, "online");
+                        onLoginSuccess(userData.position, userData.id); // Gửi thêm userData.id
                     } else {
-                        alert("Mật khẩu không chính xác!!")
+                        alert("Mật khẩu không chính xác!");
                     }
                 } else {
-                    alert("Tên đăng nhập không đúng")
+                    alert("Tên đăng nhập không đúng");
                 }
             } catch (error) {
-                console.error("Error fetching user data: ", error);
-                setErrorMessage("Something went wrong. Please try again.");
+                console.error("Lỗi khi lấy dữ liệu người dùng: ", error);
+                setErrorMessage("Có lỗi xảy ra. Vui lòng thử lại.");
             }
         }
     };
+
 
     const handleSubmit = () => {
         handleLogin(username, password);

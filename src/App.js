@@ -7,9 +7,7 @@ import PersonnelManagement from './screes/Personnel_management';
 import LoginScreen from './screes/Login';
 import CompanyScreen from './screes/CompanyScreen';
 import ProductManagement from './screes/ProductScreen';
-
-
-
+import { getDatabase, ref, update } from 'firebase/database'; // Import Firebase
 function OrderManagement() {
   return <h1>Order management</h1>;
 }
@@ -18,7 +16,7 @@ function StatisticsManagement() {
   return <h1>Statistics management</h1>;
 }
 
-function Navbar({ onLogout }) {
+function Navbar({ onLogout, position }) {
   const navigate = useNavigate();
   const [selectedTab, setSelectedTab] = React.useState('');
 
@@ -31,8 +29,19 @@ function Navbar({ onLogout }) {
   };
 
   const handleTabClick = (tab) => {
-    setSelectedTab(tab); // Cập nhật tab được chọn
+    setSelectedTab(tab);
   };
+
+  const menuItems = [
+    { label: 'Quản lý khách hàng', path: '/customer-management', roles: ['admin'] },
+    { label: 'Quản lý nhân viên', path: '/personnel_management', roles: ['admin'] },
+    { label: 'Quản lý hãng', path: '/firm_management', roles: ['admin'] },
+    { label: 'Quản lý sản phẩm', path: '/product_management', roles: ['admin', 'nv'] },
+    { label: 'Quản lý đơn hàng', path: '/order_management', roles: ['admin', 'nv'] },
+    { label: 'Quản lý thống kê', path: '/statistics_management', roles: ['admin', 'nv'] },
+  ];
+
+  const filteredMenuItems = menuItems.filter(item => item.roles.includes(position));
 
   return (
     <Drawer
@@ -43,8 +52,8 @@ function Navbar({ onLogout }) {
         [`& .MuiDrawer-paper`]: {
           width: 240,
           boxSizing: 'border-box',
-          backgroundColor: '#1976d2', // Màu background cho menu (Drawer)
-          color: 'white', // Màu chữ mặc định cho menu
+          backgroundColor: '#1976d2',
+          color: 'white',
         },
       }}
     >
@@ -57,14 +66,7 @@ function Navbar({ onLogout }) {
       </Toolbar>
       <Box sx={{ overflow: 'auto', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', height: '100%', padding: 1 }}>
         <List>
-          {[
-            { label: 'Quản lý khách hàng', path: '/customer-management' },
-            { label: 'Quản lý nhân viên', path: '/personnel_management' },
-            { label: 'Quản lý hãng', path: '/firm_management' },
-            { label: 'Quản lý sản phẩm', path: '/product_management' },
-            { label: 'Quản lý đơn hàng', path: '/order_management' },
-            { label: 'Quản lý thống kê', path: '/statistics_management' },
-          ].map((tab, index) => (
+          {filteredMenuItems.map((tab, index) => (
             <ListItem
               button
               key={index}
@@ -72,16 +74,16 @@ function Navbar({ onLogout }) {
               to={tab.path}
               onClick={() => handleTabClick(tab.path)}
               sx={{
-                color: selectedTab === tab.path ? 'yellow' : 'white', // Đổi màu chữ khi được chọn
-                justifyContent: 'center', // Canh giữa
+                color: selectedTab === tab.path ? 'yellow' : 'white',
+                justifyContent: 'center',
                 '&:hover': {
-                  backgroundColor: 'rgba(255, 255, 255, 0.2)', // Màu nền khi hover
+                  backgroundColor: 'rgba(255, 255, 255, 0.2)',
                 },
                 '&.Mui-selected': {
-                  borderBottom: '2px solid white', // Dòng kẻ dưới chân chữ khi chọn
+                  borderBottom: '2px solid white',
                 },
                 marginBottom: 2,
-                padding: '10px 20px', // Tạo khoảng cách giữa các mục
+                padding: '10px 20px',
               }}
             >
               <ListItemText primary={tab.label} />
@@ -92,15 +94,15 @@ function Navbar({ onLogout }) {
           button
           onClick={handleLogoutClick}
           sx={{
-            color: 'white', // Màu chữ
+            color: 'white',
             justifyContent: 'center',
             marginBottom: 2,
-            border: '2px solid green', // Thêm border màu đỏ
-            backgroundColor: 'green', // Màu nền
+            border: '2px solid green',
+            backgroundColor: 'green',
             '&:hover': {
-              backgroundColor: '#b71c1c', // Màu nền khi hover
+              backgroundColor: '#b71c1c',
             },
-            borderRadius: '8px', // Bo góc nhẹ cho nút
+            borderRadius: '8px',
           }}
         >
           <ListItemText primary="Đăng xuất" />
@@ -113,32 +115,62 @@ function Navbar({ onLogout }) {
 function App() {
   const [isLoggedIn, setIsLoggedIn] = React.useState(() => {
     const savedLoginStatus = localStorage.getItem('isLoggedIn');
-    return savedLoginStatus === 'true';
+    const savedPosition = localStorage.getItem('position');
+    const savedUserId = localStorage.getItem('userId'); // Lưu userId của người dùng
+    return { isLoggedIn: savedLoginStatus === 'true', position: savedPosition, userId: savedUserId };
   });
 
-  const handleLoginSuccess = () => {
-    setIsLoggedIn(true);
+  // Hàm cập nhật trạng thái người dùng trong Firebase
+  const updateUserStatus = async (userId, status) => {
+    const db = getDatabase();
+    const userRef = ref(db, `employees/${userId}`);
+    try {
+      await update(userRef, { status });
+    } catch (error) {
+      console.error('Lỗi khi cập nhật trạng thái:', error);
+    }
+  };
+
+  const handleLoginSuccess = (userPosition, userId) => {
+    setIsLoggedIn({ isLoggedIn: true, position: userPosition, userId });
     localStorage.setItem('isLoggedIn', 'true');
+    localStorage.setItem('position', userPosition);
+    localStorage.setItem('userId', userId);
+    updateUserStatus(userId, 'online'); // Cập nhật status thành online khi đăng nhập
   };
 
   const handleLogout = () => {
-    setIsLoggedIn(false);
+    const { userId } = isLoggedIn;
+    if (userId) {
+      updateUserStatus(userId, 'offline'); // Cập nhật status thành offline khi đăng xuất
+    }
+    setIsLoggedIn({ isLoggedIn: false, position: null, userId: null });
     localStorage.removeItem('isLoggedIn');
+    localStorage.removeItem('position');
+    localStorage.removeItem('userId');
   };
 
   return (
     <Router>
-      {isLoggedIn ? (
+      {isLoggedIn.isLoggedIn ? (
         <>
-          <Navbar onLogout={handleLogout} />
-          <Box sx={{ p: 3, ml: 30 }}> {/* Dịch nội dung sang phải để tránh bị che bởi Drawer */}
+          <Navbar onLogout={handleLogout} position={isLoggedIn.position} />
+          <Box sx={{ p: 3, ml: 30 }}>
             <Routes>
-              <Route path="/customer-management" element={<CustomerManagement />} />
-              <Route path="/personnel_management" element={<PersonnelManagement />} />
-              <Route path="/firm_management" element={<CompanyScreen />} />
-              <Route path="/product_management" element={<ProductManagement />} />
-              <Route path="/order_management" element={<OrderManagement />} />
-              <Route path="/statistics_management" element={<StatisticsManagement />} />
+              {isLoggedIn.position === 'admin' && (
+                <>
+                  <Route path="/customer-management" element={<CustomerManagement />} />
+                  <Route path="/personnel_management" element={<PersonnelManagement />} />
+                  <Route path="/firm_management" element={<CompanyScreen />} />
+                </>
+              )}
+              {(isLoggedIn.position === 'admin' || isLoggedIn.position === 'nv') && (
+                <>
+                  <Route path="/product_management" element={<ProductManagement />} />
+                  <Route path="/order_management" element={<OrderManagement />} />
+                  <Route path="/statistics_management" element={<StatisticsManagement />} />
+                </>
+              )}
             </Routes>
           </Box>
         </>

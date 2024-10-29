@@ -10,9 +10,7 @@ const Personnel_management = () => {
     const [email, setEmail] = useState('');
     const [username, setuserName] = useState('');
     const [password, setPassword] = useState('');
-    const [status, setStatus] = useState('');
     const [phoneNumber, setPhoneNumber] = useState('');
-    const [position, setPosition] = useState('');
     const [createdDate, setCreatedDate] = useState('');
     const [searchTerm, setSearchTerm] = useState(''); // Từ khóa tìm kiếm hãng
 
@@ -26,24 +24,24 @@ const Personnel_management = () => {
     };
 
     const handleAdd = async () => {
-        if (!name || !email || !password || !status || !phoneNumber || !position || !username) {
+        if (!name || !email || !password || !phoneNumber || !username) {
             alert('Vui lòng nhập đầy đủ thông tin');
             return;
         }
 
-        const employee = { name, email, username, password, status, phoneNumber, position };
+        const employee = { name, email, username, password, phoneNumber };
         await addEmployee(employee);
         loadEmployees();
         resetForm();
     };
 
     const handleUpdate = async () => {
-        if (!id || !name || !email || !password || !status || !phoneNumber || !position || !username) {
+        if (!id || !name || !email || !password || !phoneNumber || !username) {
             alert('Vui lòng nhập đầy đủ thông tin');
             return;
         }
 
-        const employee = { id, name, email, username, password, status, phoneNumber, position, createdDate };
+        const employee = { id, name, email, username, password, phoneNumber, createdDate };
         await updateEmployee(employee);
         loadEmployees();
         resetForm();
@@ -55,9 +53,7 @@ const Personnel_management = () => {
         setEmail(employee.email);
         setuserName(employee.username);
         setPassword(employee.password);
-        setStatus(employee.status);
         setPhoneNumber(employee.phoneNumber);
-        setPosition(employee.position);
         setCreatedDate(employee.createdDate);
     };
 
@@ -72,9 +68,7 @@ const Personnel_management = () => {
         setuserName("");
         setEmail('');
         setPassword('');
-        setStatus('');
         setPhoneNumber('');
-        setPosition('');
         setCreatedDate('');
     };
 
@@ -89,10 +83,9 @@ const Personnel_management = () => {
 
     // Lọc danh sách hãng dựa trên từ khóa tìm kiếm (không phân biệt dấu)
     const filterEdemployees = Object.keys(employees).filter((key) => {
-        const employeesName = employees[key].name;
+        const employeesName = employees[key]?.name || ''; // Sử dụng '' nếu name là undefined
         return removeVietnameseTones(employeesName.toLowerCase()).includes(removeVietnameseTones(searchTerm.toLowerCase()));
     });
-
     return (
         <div className="container">
             <h1>Quản lý nhân viên</h1>
@@ -101,9 +94,7 @@ const Personnel_management = () => {
             <input placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} style={{ marginBottom: '10px' }} />
             <input placeholder="Phone Number" value={phoneNumber} onChange={(e) => setPhoneNumber(e.target.value)} style={{ marginBottom: '10px' }} />
             <input placeholder="UserName" type="username" value={username} onChange={(e) => setuserName(e.target.value)} style={{ marginBottom: '10px' }} />
-            <input placeholder="Password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} style={{ marginBottom: '10px' }} />
-            <input placeholder="Status" value={status} onChange={(e) => setStatus(e.target.value)} style={{ marginBottom: '10px' }} />
-            <input placeholder="Position" value={position} onChange={(e) => setPosition(e.target.value)} />
+            <input placeholder="Password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} style={{ marginBottom: '10px', }} />
 
             <button onClick={handleAdd}>Thêm</button>
             <button onClick={handleUpdate} disabled={!id}>Cập nhật</button>

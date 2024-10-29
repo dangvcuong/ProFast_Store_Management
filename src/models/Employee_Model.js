@@ -1,6 +1,6 @@
 import { ref, set, push, get, child, remove } from "firebase/database";
 import { db } from '../firebaseConfig'; // Import Firebase Database từ file cấu hình
-
+import { getDatabase, update } from 'firebase/database';
 class Employee {
     constructor(id, email, username, password, name, status, phoneNumber, position, createdDate) {
         this.id = id;
@@ -22,6 +22,8 @@ export const addEmployee = async (employee) => {
     employee.id = newEmployeeRef.key; // Lấy khóa (ID) tự động
 
     // Tạo ngày hiện tại cho nhân viên mới
+    employee.position = "nv";
+    employee.status = "offline"
     employee.createdDate = new Date().toLocaleDateString();
 
     await set(newEmployeeRef, employee); // Sử dụng set để thêm dữ liệu
@@ -48,6 +50,15 @@ export const getEmployees = async () => {
 export const deleteEmployee = async (id) => {
     const dbRef = ref(db, 'employees/' + id);
     await remove(dbRef); // Sử dụng remove để xóa dữ liệu
+};
+export const updateUserStatus = async (userId, status) => {
+    const db = getDatabase();
+    const userRef = ref(db, `employees/${userId}`);
+    try {
+        await update(userRef, { status });
+    } catch (error) {
+        console.error('Lỗi khi cập nhật trạng thái:', error);
+    }
 };
 
 export default Employee;

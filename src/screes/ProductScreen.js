@@ -183,53 +183,58 @@ const ProductManagement = () => {
     return (
         <div className="container">
             <h1>Product Management</h1>
+            <div style={{ display: 'flex', gap: '250px' }}>
+                <div style={{ flex: 1 }}>
 
-            <input placeholder="Product Name" value={name} onChange={(e) => setName(e.target.value)} style={{ marginBottom: '10px' }} />
-            <input placeholder="Price" type="number" value={price} onChange={(e) => setPrice(e.target.value)} style={{ marginBottom: '10px' }} />
-            <input placeholder="Quantity" type="number" value={quantity} onChange={(e) => setQuantity(e.target.value)} style={{ marginBottom: '10px' }} />
-            <input placeholder="Description" value={describe} onChange={(e) => setDescribe(e.target.value)} style={{ marginBottom: '10px' }} />
-            <input placeholder="Rating" type="number" value={evaluate} onChange={(e) => setEvaluate(e.target.value)} style={{ marginBottom: '10px' }} />
 
-            <select value={id_Hang} onChange={(e) => setId_Hang(e.target.value)} style={{ width: "11%", padding: '8px', fontSize: '12px' }}>
-                <option value="">Chọn hãng</option>
-                {companies && Object.keys(companies).map((key) => (
-                    <option key={key} value={key}>
-                        {companies[key].name}
-                    </option>
-                ))}
-            </select>
+                    <input placeholder="Product Name" value={name} onChange={(e) => setName(e.target.value)} style={{ marginBottom: '10px' }} />
+                    <input placeholder="Price" type="number" value={price} onChange={(e) => setPrice(e.target.value)} style={{ marginBottom: '10px' }} />
+                    <input placeholder="Quantity" type="number" value={quantity} onChange={(e) => setQuantity(e.target.value)} style={{ marginBottom: '10px', }} />
+                    <input placeholder="Description" value={describe} onChange={(e) => setDescribe(e.target.value)} style={{ marginBottom: '10px' }} />
+                    <input placeholder="Rating" type="number" value={evaluate} onChange={(e) => setEvaluate(e.target.value)} style={{ marginBottom: '10px' }} />
 
-            <input type="file" onChange={handleImageChange} style={{ marginBottom: '10px' }} />
-            <button onClick={handleAdd}>Add</button>
-            <button onClick={handleUpdate} disabled={!id}>Update</button>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '40px', marginBottom: '20px', }}>
-                <div style={{}}>
-                    <h3>Lọc sản phẩm theo hãng</h3>
-                    <select
-                        value={selectedCompany}
-                        onChange={(e) => setSelectedCompany(e.target.value)}
-                        style={{ width: '100%', padding: '8px', fontSize: '16px' }}
-                    >
-                        <option value="">Tất cả sản phẩm</option>
+                    <select value={id_Hang} onChange={(e) => setId_Hang(e.target.value)} style={{ width: "40%", padding: '8px', fontSize: '12px' }}>
+                        <option value="">Chọn hãng</option>
                         {companies && Object.keys(companies).map((key) => (
                             <option key={key} value={key}>
                                 {companies[key].name}
                             </option>
                         ))}
                     </select>
+                    <div style={{ height: 5 }}></div>
+                    <input type="file" onChange={handleImageChange} />
+                    <button onClick={handleAdd}>Add</button>
+                    <button onClick={handleUpdate} disabled={!id}>Update</button>
                 </div>
                 <div style={{ flex: 1 }}>
-                    <h3>Tìm kiếm sản phẩm</h3>
-                    <input
-                        placeholder="Nhập tên sản phẩm cần tìm"
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        style={{ width: '50%', padding: '8px', fontSize: '16px' }}
-                    />
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '40px', marginTop: '15%' }}>
+                        <div style={{}}>
+                            <h3>Lọc sản phẩm theo hãng</h3>
+                            <select
+                                value={selectedCompany}
+                                onChange={(e) => setSelectedCompany(e.target.value)}
+                                style={{ width: '100%', padding: '8px', fontSize: '16px', }}
+                            >
+                                <option value="">Tất cả sản phẩm</option>
+                                {companies && Object.keys(companies).map((key) => (
+                                    <option key={key} value={key}>
+                                        {companies[key].name}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+                        <div style={{ flex: 1 }}>
+                            <h3>Tìm kiếm sản phẩm</h3>
+                            <input
+                                placeholder="Nhập tên sản phẩm cần tìm"
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                style={{ width: '100%', padding: '8px', fontSize: '16px' }}
+                            />
+                        </div>
+                    </div>
                 </div>
             </div>
-
-
 
             <h2>Product List</h2>
             <div className="table-container">

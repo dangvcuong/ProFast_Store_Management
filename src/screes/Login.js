@@ -30,7 +30,7 @@ const LoginScreen = ({ onLoginSuccess }) => {
                         alert("Mật khẩu không chính xác!");
                     }
                 } else {
-                    alert("Tên đăng nhập không đúng");
+                    alert("Tên đăng nhập không đúng.");
                 }
             } catch (error) {
                 console.error("Lỗi khi lấy dữ liệu người dùng: ", error);

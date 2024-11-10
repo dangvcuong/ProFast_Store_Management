@@ -10,7 +10,7 @@ const LoginScreen = ({ onLoginSuccess }) => {
 
     const handleLogin = async (username, password) => {
         if (username === "" || password === "") {
-            alert("Vui lòng nhập đầy đủ thông tin");
+            alert("Vui lòng nhập đầy đủ thông tin"); 
         } else {
             if (username === "admin" || password === "admin") {
                 onLoginSuccess("admin");

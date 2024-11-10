@@ -7,10 +7,9 @@ import PersonnelManagement from './screes/Personnel_management';
 import LoginScreen from './screes/Login';
 import CompanyScreen from './screes/CompanyScreen';
 import ProductManagement from './screes/ProductScreen';
+import OrderManagerScreen from './screes/OrderManagerScreen';
 import { getDatabase, ref, update } from 'firebase/database'; // Import Firebase
-function OrderManagement() {
-  return <h1>Order management</h1>;
-}
+
 
 function StatisticsManagement() {
   return <h1>Statistics management</h1>;
@@ -167,7 +166,7 @@ function App() {
               {(isLoggedIn.position === 'admin' || isLoggedIn.position === 'nv') && (
                 <>
                   <Route path="/product_management" element={<ProductManagement />} />
-                  <Route path="/order_management" element={<OrderManagement />} />
+                  <Route path="/order_management" element={<OrderManagerScreen />} />
                   <Route path="/statistics_management" element={<StatisticsManagement />} />
                 </>
               )}

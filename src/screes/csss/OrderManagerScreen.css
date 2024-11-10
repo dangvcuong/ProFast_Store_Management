@@ -1,0 +1,137 @@
+/* Container */
+.container {
+    width: 90%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+h1 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #333;
+    font-size: 1.8em;
+}
+
+/* Table */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    text-align: left;
+}
+
+table th, table td {
+    padding: 15px;
+    border: 1px solid #ddd;
+}
+
+table th {
+    background-color: #4CAF50;
+    color: white;
+    font-weight: bold;
+    text-align: center;
+}
+
+table td {
+    background-color: #fff;
+    color: #333;
+    word-wrap: break-word;
+    vertical-align: top;
+}
+
+/* Product Information */
+ul {
+    padding-left: 20px;
+}
+
+ul li {
+    margin-bottom: 10px;
+}
+
+/* Buttons */
+button {
+    padding: 10px 16px;
+    margin: 5px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9em;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    opacity: 0.9;
+}
+
+button:nth-child(1) {
+    background-color: #17a2b8;
+    color: white;
+}
+
+button:nth-child(2) {
+    background-color: #28a745;
+    color: white;
+}
+
+button:nth-child(3) {
+    background-color: #dc3545;
+    color: white;
+}
+
+/* Disabled state for buttons */
+button:disabled {
+    background-color: #e0e0e0;
+    cursor: not-allowed;
+}
+
+/* Container for buttons */
+.button-container {
+    display: flex;
+    justify-content: space-evenly; /* Căn đều các nút */
+    gap: 10px; /* Khoảng cách giữa các nút */
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .container {
+        width: 100%;
+        padding: 10px;
+    }
+
+    table, thead, tbody, th, td, tr {
+        display: block;
+        width: 100%;
+    }
+
+    th, td {
+        text-align: right;
+        padding-left: 50%;
+    }
+
+    th {
+        text-align: left;
+        background-color: #4CAF50;
+        color: white;
+    }
+
+    tr {
+        margin-bottom: 10px;
+        border-bottom: 1px solid #ddd;
+    }
+
+    td::before {
+        content: attr(data-label);
+        font-weight: bold;
+        display: block;
+    }
+
+    td {
+        text-align: left;
+        padding-left: 10px;
+    }
+}

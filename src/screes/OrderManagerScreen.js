@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { fetchOrders, confirmOrderStatus } from '../models/OrderModel';
+import { fetchOrders, confirmOrderStatus, cancelOrderStatus } from '../models/OrderModel';
 import '../screes/csss/OrderManagerScreen.css';
 
 const OrderManagerScreen = () => {
@@ -7,19 +7,29 @@ const OrderManagerScreen = () => {
 
     useEffect(() => {
         fetchOrders((data) => {
-            console.log("Dữ liệu nhận được:", data); // Kiểm tra dữ liệu đã tải
+            console.log("Dữ liệu nhận được:", data);
             setOrders(data);
         });
     }, []);
 
     const handleConfirmStatus = async (orderId) => {
-        await confirmOrderStatus(orderId);
-        alert('Trạng thái đơn hàng đã được cập nhật');
-        fetchOrders(setOrders); // Cập nhật lại danh sách đơn hàng sau khi xác nhận
+        const result = await confirmOrderStatus(orderId);
+        if (result) {
+            alert('Trạng thái đơn hàng đã được cập nhật');
+            fetchOrders(setOrders);
+        } else {
+            alert('Lỗi khi cập nhật trạng thái đơn hàng');
+        }
     };
 
-    const handleViewDetails = (order) => {
-        alert(JSON.stringify(order, null, 2));
+    const handleCancelStatus = async (orderId) => {
+        const result = await cancelOrderStatus(orderId);
+        if (result) {
+            alert('Trạng thái đơn hàng đã được cập nhật thành "Đã hủy"');
+            fetchOrders(setOrders);
+        } else {
+            alert('Lỗi khi cập nhật trạng thái đơn hàng');
+        }
     };
 
     return (
@@ -28,67 +38,49 @@ const OrderManagerScreen = () => {
             <table>
                 <thead>
                     <tr>
+                        <th>STT</th>
                         <th>Mã đơn hàng</th>
-                        <th>Ngày đặt hàng</th>
+                        <th>Ngày tạo</th>
+                        <th>Người mua</th>
+                        <th>Sản phẩm</th>
+                        <th>Giá</th>
+                        <th>Thanh toán</th>
                         <th>Trạng thái</th>
-                        <th>Tổng số tiền</th>
-                        <th>Tên người nhận</th>
-                        <th>Tên sản phẩm</th>
-                        <th>Số lượng</th>
                         <th>Thao tác</th>
                     </tr>
                 </thead>
                 <tbody>
                     {orders && Object.keys(orders).length > 0 ? (
-                        Object.keys(orders).map((key) => {
+                        Object.keys(orders).map((key, index) => {
                             const order = orders[key];
                             return (
                                 <tr key={key}>
+                                    <td>{index + 1}</td>
                                     <td>{key}</td>
-                                    <td>
-                                        {order.orderDate ? new Date(order.orderDate).toLocaleString() : 'Không có ngày đặt hàng'}
-                                    </td>
-                                    <td>{order.orderStatus || 'Chưa cập nhật'}</td>
+                                    <td>{order.orderDate ? new Date(order.orderDate).toLocaleString() : 'N/A'}</td>
+                                    <td>{order.shippingAddress ? order.shippingAddress.nameAddresUser : 'N/A'}</td>
+                                    <td>{order.products ? order.products[0].name : 'N/A'}</td>
                                     <td>{order.totalAmount ? `${Number(order.totalAmount).toLocaleString()} VND` : 'N/A'}</td>
-                                    <td>{order.shippingAddress ? order.shippingAddress.nameAddresUser : 'Không có tên người nhận'}</td>
+                                    <td>Chuyển khoản</td>
                                     <td>
-                                        {order.products ? (
-                                            <ul>
-                                                {order.products.map((product, index) => (
-                                                    <li key={index}>
-                                                        <p>{product.name}</p>
-                                                    </li>
-                                                ))}
-                                            </ul>
-                                        ) : (
-                                            <p>Không có sản phẩm</p>
-                                        )}
+                                        <button className={order.orderStatus === 'Đã xác nhận' ? 'confirm' : order.orderStatus === 'Đã hủy' ? 'cancel' : 'pending'}>
+                                            {order.orderStatus || 'Chờ xác nhận'}
+                                        </button>
                                     </td>
-                                    <td>
-                                        {order.products ? (
-                                            <ul>
-                                                {order.products.map((product, index) => (
-                                                    <li key={index}>
-                                                        <p>{product.quantity}</p>
-                                                    </li>
-                                                ))}
-                                            </ul>
-                                        ) : (
-                                            <p>Không có sản phẩm</p>
-                                        )}
-                                    </td>
-                                    <td>
-                                        <div className="button-container">
-                                            <button onClick={() => handleViewDetails(order)}>Xem chi tiết</button>
-                                            <button onClick={() => handleConfirmStatus(key)}>Xác nhận</button>
-                                        </div>
+                                    <td className="action-cell">
+                                        <button className="confirm" onClick={() => handleConfirmStatus(key)}>
+                                            Xác nhận
+                                        </button>
+                                        <button className="cancel" onClick={() => handleCancelStatus(key)}>
+                                            Huỷ
+                                        </button>
                                     </td>
                                 </tr>
                             );
                         })
                     ) : (
                         <tr>
-                            <td colSpan="8">Không có đơn hàng nào</td>
+                            <td colSpan="9">Không có đơn hàng nào</td>
                         </tr>
                     )}
                 </tbody>

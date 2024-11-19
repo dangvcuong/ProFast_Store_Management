@@ -11,6 +11,7 @@ const Personnel_management = () => {
     const [username, setuserName] = useState('');
     const [password, setPassword] = useState('');
     const [phoneNumber, setPhoneNumber] = useState('');
+    const [position, setPosition] = useState('')
     const [createdDate, setCreatedDate] = useState('');
     const [searchTerm, setSearchTerm] = useState(''); // Từ khóa tìm kiếm hãng
 
@@ -24,12 +25,13 @@ const Personnel_management = () => {
     };
 
     const handleAdd = async () => {
+        setPosition('nv');
         if (!name || !email || !password || !phoneNumber || !username) {
             alert('Vui lòng nhập đầy đủ thông tin');
             return;
         }
 
-        const employee = { name, email, username, password, phoneNumber };
+        const employee = { name, email, username, password, phoneNumber, position };
         await addEmployee(employee);
         loadEmployees();
         resetForm();

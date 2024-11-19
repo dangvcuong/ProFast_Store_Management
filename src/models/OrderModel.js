@@ -24,7 +24,7 @@ export const fetchOrders = (callback) => {
 export const confirmOrderStatus = async (orderId) => {
     const orderRef = dbRef(db, `/orders/${orderId}`);
     try {
-        await update(orderRef, { orderStatus: 'Đã xác nhận' });
+        await update(orderRef, { orderStatus: 'Đang giao hàng' });
         console.log('Trạng thái đơn hàng đã được cập nhật');
         return true;
     } catch (error) {

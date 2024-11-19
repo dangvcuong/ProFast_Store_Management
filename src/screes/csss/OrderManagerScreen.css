@@ -1,4 +1,72 @@
 /* Container */
+.confirmation-dialog {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5); 
+    display: flex;
+    justify-content: center; 
+    align-items: center; 
+    z-index: 1000;
+    padding: 20px;
+}
+
+.dialog-content {
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 10px;
+    text-align: center;
+    width: 400px; /* Chiều rộng hộp thoại */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); 
+}
+
+.dialog-content h3 {
+    margin-bottom: 20px;
+    font-size: 18px;
+    color: #333;
+}
+
+.dialog-content button {
+    margin-top: 10px;
+    width: 45%; /* Chiều rộng nút */
+    padding: 12px;
+    font-size: 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.dialog-content button:first-child {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+}
+
+.dialog-content button:first-child:hover {
+    background-color: #45a049; /* Màu khi hover */
+}
+
+.dialog-content button:last-child {
+    background-color: #f44336;
+    color: white;
+    border: none;
+}
+
+.dialog-content button:last-child:hover {
+    background-color: #e53935; /* Màu khi hover */
+}
+
+.dialog-footer {
+    display: flex;
+    justify-content: space-around; /* Canh đều các nút */
+    margin-top: 20px;
+}
+
+.dialog-footer button {
+    width: 45%;
+}
 .container {
     width: 95%;
     max-width: 1200px;
@@ -43,6 +111,49 @@ button {
     cursor: pointer;
     font-size: 0.85em;
     transition: background-color 0.3s ease;
+}
+.product-details-dialog {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center; /* Căn giữa theo chiều ngang */
+    align-items: center; /* Căn giữa theo chiều dọc */
+    background-color: rgba(0, 0, 0, 0.5); /* Màu nền mờ cho hộp thoại */
+    z-index: 1000; /* Đảm bảo hộp thoại ở trên cùng */
+}
+
+/* Định dạng cho nội dung trong hộp thoại */
+.product-details-dialog .dialog-content {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    width: 400px; /* Chiều rộng của hộp thoại */
+    max-height: 80%; /* Chiều cao tối đa */
+    overflow-y: auto; /* Thêm thanh cuộn nếu nội dung quá dài */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Định dạng cho nút đóng */
+.product-details-dialog .dialog-footer {
+    text-align: right;
+    margin-top: 20px;
+}
+
+.product-details-dialog .dialog-footer button {
+    padding: 8px 16px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.product-details-dialog .dialog-footer button:hover {
+    background-color: #0056b3;
 }
 
 button:hover {

@@ -118,7 +118,7 @@ const Customer_managenments = () => {
                                 <td style={{ textAlign: 'center', verticalAlign: 'middle' }}>{user.userModel.status}</td>
                                 <td style={{ textAlign: 'center', verticalAlign: 'middle' }}>
                                     <button onClick={() => deactivateUser(user.userModel.id)}>
-                                        Customer reports
+                                        Khóa tài khoản
                                     </button>
                                 </td>
                             </tr>

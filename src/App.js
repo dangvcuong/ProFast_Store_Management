@@ -10,6 +10,8 @@ import ProductManagement from './screes/ProductScreen';
 import OrderManagerScreen from './screes/OrderManagerScreen';
 import { getDatabase, ref, update } from 'firebase/database'; // Import Firebase
 
+import ChatBoxScreen from './screes/ChatBoxScreen';
+
 
 function StatisticsManagement() {
   return <h1>Statistics management</h1>;
@@ -38,6 +40,7 @@ function Navbar({ onLogout, position }) {
     { label: 'Quản lý sản phẩm', path: '/product_management', roles: ['admin', 'nv'] },
     { label: 'Quản lý đơn hàng', path: '/order_management', roles: ['admin', 'nv'] },
     { label: 'Quản lý thống kê', path: '/statistics_management', roles: ['admin', 'nv'] },
+    { label: 'Chat box', path: '/chat_box', roles: ['admin', 'nv'] },
   ];
 
   const filteredMenuItems = menuItems.filter(item => item.roles.includes(position));
@@ -168,6 +171,7 @@ function App() {
                   <Route path="/product_management" element={<ProductManagement />} />
                   <Route path="/order_management" element={<OrderManagerScreen />} />
                   <Route path="/statistics_management" element={<StatisticsManagement />} />
+                  <Route path="/chat_box" element={<ChatBoxScreen />} />
                 </>
               )}
             </Routes>

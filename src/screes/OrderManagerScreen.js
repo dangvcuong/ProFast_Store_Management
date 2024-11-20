@@ -46,7 +46,7 @@ const OrderManagerScreen = () => {
             alert('Trạng thái đơn hàng đã được cập nhật thành "Thành công"');
             fetchOrders(setOrders);
         } else {
-            alert('Lỗi khi cập nhật trạng thái đơn hàng');
+            alert('Lỗi khi cập nhật trạng thái thành công');
         }
     };
 
@@ -196,18 +196,27 @@ const OrderManagerScreen = () => {
             {/* Hiển thị chi tiết sản phẩm */}
             {productDetails && (
                 <div className="product-details-dialog">
+                    <div className="dialog-overlay" onClick={closeDialog}></div>
                     <div className="dialog-content">
                         <h3>Chi tiết sản phẩm trong đơn hàng</h3>
-                        <ul>
+                        <div className="product-grid">
                             {productDetails.map((product, index) => (
-                                <li key={index}>
-                                    <p>Tên sản phẩm: {product.name}</p>
-                                    <p>Giá: {product.price} VND</p>
-                                    <p>Số lượng: {product.quantity}</p>
-                                </li>
+                                <div key={index} className="product-item">
+                                    <div className="product-image">
+                                        <img
+                                            src={product.imageUrl || '/default-product-image.png'}
+                                            alt={product.name}
+                                        />
+                                    </div>
+                                    <div className="product-info">
+                                        <p><strong>Tên sản phẩm:</strong> {product.name}</p>
+                                        <p><strong>Giá:</strong> {product.price.toLocaleString()} VND</p>
+                                        <p><strong>Số lượng:</strong> {product.quantity}</p>
+                                    </div>
+                                </div>
                             ))}
-                        </ul>
-                        <button onClick={closeDialog}>Đóng</button>
+                        </div>
+                        <button className="close-dialog-btn" onClick={closeDialog}>Đóng</button>
                     </div>
                 </div>
             )}

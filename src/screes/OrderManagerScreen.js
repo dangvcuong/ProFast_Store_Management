@@ -33,6 +33,8 @@ const OrderManagerScreen = () => {
             if (snapshot.exists()) {
                 // Đảm bảo giá trị hiện tại là một số
                 let currentQuantitySold = Number(snapshot.val().quantitysold || 0);
+                let currentQuantity = Number(snapshot.val().quantity || 0);
+
 
                 // Đảm bảo giá trị cần cộng thêm là một số
                 const quantityToAddNumber = Number(quantityToAdd);
@@ -44,10 +46,11 @@ const OrderManagerScreen = () => {
 
                 // Cộng thêm số lượng bán mới
                 const newQuantitySold = currentQuantitySold + quantityToAddNumber;
-
+                const newsoluong = currentQuantity - quantityToAddNumber;
                 // Cập nhật lại giá trị quantitysold trong Firebase
                 await update(productRef, {
                     quantitysold: newQuantitySold,
+                    quantity: newsoluong,
                 });
 
                 console.log(`Cập nhật thành công số lượng bán cho sản phẩm ${productId}`);

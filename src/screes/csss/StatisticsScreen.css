@@ -37,3 +37,29 @@ canvas {
     max-width: 100%;
     height: auto;
 }
+/* Container chứa các tab */
+.tab-navigation {
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: space-between; /* Căn đều các tab */
+  }
+  
+  /* Các tab riêng lẻ */
+  .tab {
+    padding: 8px 16px; /* Thu ngắn padding của các tab */
+    cursor: pointer;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    
+    flex-grow: 1; /* Tất cả các tab sẽ chia đều không gian */
+    text-align: center; /* Căn giữa nội dung trong tab */
+    font-size: 14px; /* Thu nhỏ font-size nếu cần */
+  }
+  
+  /* Tab khi được chọn */
+  .tab.active {
+    background-color: white; /* Nền trắng khi tab được chọn */
+    color: black; /* Màu chữ đen khi tab được chọn */
+    font-weight: bold;
+    border: 0.5px solid black; /* Bo viền đen 0.5px */
+  }

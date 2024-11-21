@@ -27,6 +27,7 @@ ChartJS.register(
 const StatisticsManagement = () => {
   const [revenueData, setRevenueData] = useState(null);
   const [productData, setProductData] = useState(null);
+  const [selectedTab, setSelectedTab] = useState('revenue'); // Trạng thái lưu tab hiện tại
 
   useEffect(() => {
     const fetchData = async () => {
@@ -47,7 +48,6 @@ const StatisticsManagement = () => {
             label: 'Doanh thu (triệu VNĐ)',
             data: months.map((_, index) => {
               const monthKey = dayjs().month(index).format("MM-YYYY");
-              console.log(`Tháng: ${monthKey}, Doanh thu: ${monthlyRevenue[monthKey] || 0}`);
               return monthlyRevenue[monthKey] ? (monthlyRevenue[monthKey] / 1_000_000).toFixed(2) : 0;
             }),
             backgroundColor: 'rgba(75, 192, 192, 0.6)',
@@ -88,70 +88,81 @@ const StatisticsManagement = () => {
   return (
     <div className="container">
       <h1>Quản lý Thống kê</h1>
-      <div className="chart-container">
-        <h2>Doanh thu theo tháng</h2>
-        {revenueData ? (
-          <Bar 
-            data={revenueData} 
-            options={{
-              plugins: {
-                tooltip: {
-                  callbacks: {
-                    label: (context) => {
-                      return `${context.raw.toLocaleString()} triệu VNĐ`; // Định dạng tooltip
-                    },
-                  },
-                },
-                datalabels: {
-                  color: '#000',
-                  anchor: 'end',
-                  align: 'top',
-                  formatter: (value) => {
-                    // Chỉ hiển thị giá trị nếu khác 0
-                    return value > 0 ? `${value} triệu` : '';
-                  },
-                  font: {
-                    weight: 'bold',
-                  },
-                },
-              },
-            }}
-          />
-        ) : (
-          <p>Đang tải dữ liệu doanh thu...</p>
-        )}
+      
+      {/* Tab Navigation */}
+      <div className="tab-navigation">
+        <button 
+          className={`tab ${selectedTab === 'revenue' ? 'active' : ''}`} 
+          onClick={() => setSelectedTab('revenue')}
+        >
+          Doanh thu
+        </button>
+        <button 
+          className={`tab ${selectedTab === 'products' ? 'active' : ''}`} 
+          onClick={() => setSelectedTab('products')}
+        >
+          Sản phẩm bán chạy
+        </button>
       </div>
+
+      {/* Biểu đồ */}
       <div className="chart-container">
-        <h2>Sản phẩm bán chạy nhất</h2>
-        {productData ? (
-          <Bar 
-            data={productData}
-            options={{
-              plugins: {
-                tooltip: {
-                  callbacks: {
-                    label: (context) => {
-                      return `${context.raw.toLocaleString()} sản phẩm`;
+        {selectedTab === 'revenue' && revenueData ? (
+          <>
+            <h2>Doanh thu theo tháng</h2>
+            <Bar 
+              data={revenueData} 
+              options={{
+                plugins: {
+                  tooltip: {
+                    callbacks: {
+                      label: (context) => {
+                        return `${context.raw.toLocaleString()} triệu VNĐ`; // Định dạng tooltip
+                      },
+                    },
+                  },
+                  datalabels: {
+                    color: '#000',
+                    anchor: 'end',
+                    align: 'top',
+                    formatter: (value) => value > 0 ? `${value} triệu` : '',
+                    font: {
+                      weight: 'bold',
                     },
                   },
                 },
-                datalabels: {
-                  color: '#000',
-                  anchor: 'end',
-                  align: 'top',
-                  formatter: (value) => {
-                    // Chỉ hiển thị số lượng nếu lớn hơn 0
-                    return value > 0 ? `${value} sản phẩm` : '';
+              }}
+            />
+          </>
+        ) : selectedTab === 'products' && productData ? (
+          <>
+            <h2>Sản phẩm bán chạy nhất</h2>
+            <Bar 
+              data={productData}
+              options={{
+                plugins: {
+                  tooltip: {
+                    callbacks: {
+                      label: (context) => {
+                        return `${context.raw.toLocaleString()} sản phẩm`;
+                      },
+                    },
                   },
-                  font: {
-                    weight: 'bold',
+                  datalabels: {
+                    color: '#000',
+                    anchor: 'end',
+                    align: 'top',
+                    formatter: (value) => value > 0 ? `${value} sản phẩm` : '',
+                    font: {
+                      weight: 'bold',
+                    },
                   },
                 },
-              },
-            }}
-          />
+              }}
+            />
+          </>
         ) : (
-          <p>Đang tải dữ liệu sản phẩm...</p>
+          <p>Đang tải dữ liệu...</p>
         )}
       </div>
     </div>

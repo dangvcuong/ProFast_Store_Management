@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Bar } from 'react-chartjs-2';
-import fetchStatisticsData from '../models/Statistics_Model'; // Đường dẫn đúng
+import fetchStatisticsData from '../models/Statistics_Model';
 import '../screes/csss/StatisticsScreen.css';
 import dayjs from 'dayjs';
 import {
@@ -12,6 +12,7 @@ import {
   Tooltip,
   Legend,
 } from 'chart.js';
+import ChartDataLabels from 'chartjs-plugin-datalabels'; // Import plugin
 
 ChartJS.register(
   CategoryScale,
@@ -19,7 +20,8 @@ ChartJS.register(
   BarElement,
   Title,
   Tooltip,
-  Legend
+  Legend,
+  ChartDataLabels // Đăng ký plugin
 );
 
 const StatisticsManagement = () => {
@@ -42,11 +44,10 @@ const StatisticsManagement = () => {
         labels: months,
         datasets: [
           {
-            label: 'Doanh thu (triệu VNĐ)', // Thay đổi thành triệu VNĐ
+            label: 'Doanh thu (triệu VNĐ)',
             data: months.map((_, index) => {
               const monthKey = dayjs().month(index).format("MM-YYYY");
               console.log(`Tháng: ${monthKey}, Doanh thu: ${monthlyRevenue[monthKey] || 0}`);
-              // Chuyển sang triệu VNĐ
               return monthlyRevenue[monthKey] ? (monthlyRevenue[monthKey] / 1_000_000).toFixed(2) : 0;
             }),
             backgroundColor: 'rgba(75, 192, 192, 0.6)',
@@ -96,10 +97,21 @@ const StatisticsManagement = () => {
               plugins: {
                 tooltip: {
                   callbacks: {
-                    // Thêm đơn vị triệu VNĐ vào tooltip
                     label: (context) => {
-                      return `${context.raw.toLocaleString()} triệu VNĐ`; 
+                      return `${context.raw.toLocaleString()} triệu VNĐ`; // Định dạng tooltip
                     },
+                  },
+                },
+                datalabels: {
+                  color: '#000',
+                  anchor: 'end',
+                  align: 'top',
+                  formatter: (value) => {
+                    // Chỉ hiển thị giá trị nếu khác 0
+                    return value > 0 ? `${value} triệu` : '';
+                  },
+                  font: {
+                    weight: 'bold',
                   },
                 },
               },
@@ -112,7 +124,32 @@ const StatisticsManagement = () => {
       <div className="chart-container">
         <h2>Sản phẩm bán chạy nhất</h2>
         {productData ? (
-          <Bar data={productData} />
+          <Bar 
+            data={productData}
+            options={{
+              plugins: {
+                tooltip: {
+                  callbacks: {
+                    label: (context) => {
+                      return `${context.raw.toLocaleString()} sản phẩm`;
+                    },
+                  },
+                },
+                datalabels: {
+                  color: '#000',
+                  anchor: 'end',
+                  align: 'top',
+                  formatter: (value) => {
+                    // Chỉ hiển thị số lượng nếu lớn hơn 0
+                    return value > 0 ? `${value} sản phẩm` : '';
+                  },
+                  font: {
+                    weight: 'bold',
+                  },
+                },
+              },
+            }}
+          />
         ) : (
           <p>Đang tải dữ liệu sản phẩm...</p>
         )}

@@ -20,7 +20,7 @@ const ProductManagement = () => {
     const [imageUrl, setImageUrl] = useState('');
     const [selectedCompany, setSelectedCompany] = useState('');
     const [searchTerm, setSearchTerm] = useState('');
-    const quantitysold = "0";
+    const quantitysold = 0;
     useEffect(() => {
         loadProductsRealtime();
         loadCompanies();
@@ -84,14 +84,14 @@ const ProductManagement = () => {
 
             const product = {
                 name,
-                price,
-                quantity,
+                price: Number(price),
+                quantity: Number(quantity),
                 dateOfEntry: new Date().toISOString(),
                 describe,
                 evaluate,
                 id_Hang,
                 imageUrl: uploadedImageUrl,
-                quantitysold,
+                quantitysold: Number(quantitysold),
             };
 
             await addProduct(product);
@@ -124,7 +124,7 @@ const ProductManagement = () => {
                 }
             }
 
-            const product = { id, name, price, quantity, describe, evaluate, id_Hang, imageUrl: uploadedImageUrl, quantitysold };
+            const product = { id, name, price: Number(price), quantity: Number(quantity), describe, evaluate, id_Hang, imageUrl: uploadedImageUrl, quantitysold: Number(quantitysold), };
             await updateProduct(product);
 
             alert("Product updated successfully!");

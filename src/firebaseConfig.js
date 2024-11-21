@@ -1,10 +1,8 @@
-// firebaseConfig.js
-import { initializeApp } from "firebase/app";
-import { getDatabase } from "firebase/database";
-import { getStorage } from "firebase/storage"; // Import Firebase Storage
-import firebase from 'firebase/app';
-import 'firebase/database';
-// Firebase configuration
+import { initializeApp } from 'firebase/app';
+import { getDatabase } from 'firebase/database';
+import { getStorage } from 'firebase/storage';
+import { getFirestore } from 'firebase/firestore';
+
 const firebaseConfig = {
     apiKey: "AIzaSyBtZ1vhjaQHS-FZA4VfS4vZYHu9X6_9PFk",
     authDomain: "profast-e9fdf.firebaseapp.com",
@@ -18,7 +16,8 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
-const storage = getStorage(app); // Khởi tạo Firebase Storage
+const db = getDatabase(app);  // Using the modular approach
+const storage = getStorage(app);
+const store = getFirestore(app);
 
-export { db, storage, app }; // Export Storage để sử dụng trong các tệp khác
+export { db, storage, store, app };

@@ -6,6 +6,8 @@ import {
     markOrderAsDelivered,
 } from '../models/OrderModel';
 import '../screes/csss/OrderManagerScreen.css';
+import { ref, get, update } from 'firebase/database';  // Import Realtime Database methods
+import { db } from '../firebaseConfig'; // Ensure you're importing the correct Firebase instance
 
 const OrderManagerScreen = () => {
     const [orders, setOrders] = useState({});
@@ -17,6 +19,49 @@ const OrderManagerScreen = () => {
     useEffect(() => {
         fetchOrders((data) => setOrders(data));
     }, []);
+
+
+    const updateProductSoldQuantity = async (productId, quantityToAdd) => {
+        try {
+            // Lấy reference tới sản phẩm trong Firebase
+            const productRef = ref(db, `products/${productId}`);
+
+            // Lấy dữ liệu của sản phẩm
+            const snapshot = await get(productRef);
+
+            // Kiểm tra xem sản phẩm có tồn tại trong DB không
+            if (snapshot.exists()) {
+                // Đảm bảo giá trị hiện tại là một số
+                let currentQuantitySold = Number(snapshot.val().quantitysold || 0);
+
+                // Đảm bảo giá trị cần cộng thêm là một số
+                const quantityToAddNumber = Number(quantityToAdd);
+
+                if (isNaN(quantityToAddNumber)) {
+                    console.error(`Số lượng cần cộng không hợp lệ: ${quantityToAdd}`);
+                    return false;
+                }
+
+                // Cộng thêm số lượng bán mới
+                const newQuantitySold = currentQuantitySold + quantityToAddNumber;
+
+                // Cập nhật lại giá trị quantitysold trong Firebase
+                await update(productRef, {
+                    quantitysold: newQuantitySold,
+                });
+
+                console.log(`Cập nhật thành công số lượng bán cho sản phẩm ${productId}`);
+                return true;
+            } else {
+                console.error(`Sản phẩm không tồn tại: ${productId}`);
+                return false;
+            }
+        } catch (error) {
+            console.error(`Lỗi khi cập nhật số lượng bán cho sản phẩm ${productId}:`, error.message);
+            return false;
+        }
+    };
+
 
     const handleConfirmStatus = async (orderId) => {
         const result = await confirmOrderStatus(orderId);
@@ -43,10 +88,31 @@ const OrderManagerScreen = () => {
     const handleMarkAsDelivered = async (orderId) => {
         const result = await markOrderAsDelivered(orderId);
         if (result) {
-            alert('Trạng thái đơn hàng đã được cập nhật thành "Thành công"');
-            fetchOrders(setOrders);
+            const order = orders[orderId];
+            let updateResults = [];
+
+            // Lặp qua từng sản phẩm trong đơn hàng
+            for (const product of order.products) {
+                try {
+                    // Cập nhật số lượng đã bán
+                    const updateResult = await updateProductSoldQuantity(product.id, product.quantity);
+                    updateResults.push(updateResult);
+                } catch (error) {
+                    console.error(`Lỗi khi cập nhật số lượng bán cho sản phẩm ${product.id}: `, error);
+                    updateResults.push(false); // If update fails, push false
+                }
+            }
+
+            // Kiểm tra nếu tất cả cập nhật thành công
+            if (updateResults.every(result => result)) {
+                alert('Trạng thái đơn hàng đã được cập nhật thành "Thành công" và số lượng bán được đã được cập nhật.');
+            } else {
+                alert('Lỗi khi cập nhật số lượng bán được cho một số sản phẩm. Vui lòng kiểm tra lại.');
+            }
+
+            fetchOrders(setOrders); // Làm mới danh sách đơn hàng
         } else {
-            alert('Lỗi khi cập nhật trạng thái thành công');
+            alert('Lỗi khi cập nhật trạng thái đơn hàng');
         }
     };
 
@@ -117,8 +183,8 @@ const OrderManagerScreen = () => {
                                                 order.orderStatus === 'Thành công'
                                                     ? 'success'
                                                     : order.orderStatus === 'Đã hủy'
-                                                    ? 'cancel'
-                                                    : 'pending'
+                                                        ? 'cancel'
+                                                        : 'pending'
                                             }
                                         >
                                             {order.orderStatus || 'Chờ xác nhận'}

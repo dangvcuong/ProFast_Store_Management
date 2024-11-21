@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import firebase from "firebase/compat/app"; // Import Firebase
+
 import "firebase/compat/database"; // Import Firebase Realtime Database
-import { db } from '../firebaseConfig';
+import { db, storage, store } from '../firebaseConfig';
 import { ref as dbRef, push, set, onValue } from "firebase/database";
 
 const ChatBoxScreen = () => {

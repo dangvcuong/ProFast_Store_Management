@@ -36,6 +36,11 @@ export const getProducts = async () => {
     const snapshot = await get(ref(db, '/products'));
     return snapshot.exists() ? snapshot.val() : {};
 };
+export const getProductsQuantitySold = async (id) => {
+    const snapshot = await get(ref(db, '/products/', id));
+    return snapshot.exists() ? snapshot.val() : {};
+};
+
 
 // Cập nhật sản phẩm trong Firebase (không cho phép thay đổi ngày nhập)
 export const updateProduct = async (product) => {

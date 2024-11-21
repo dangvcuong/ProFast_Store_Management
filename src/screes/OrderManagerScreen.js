@@ -1,30 +1,32 @@
 import React, { useState, useEffect } from 'react';
-import { fetchOrders, confirmOrderStatus, cancelOrderStatus } from '../models/OrderModel';
+import {
+    fetchOrders,
+    confirmOrderStatus,
+    cancelOrderStatus,
+    markOrderAsDelivered,
+} from '../models/OrderModel';
 import '../screes/csss/OrderManagerScreen.css';
 
 const OrderManagerScreen = () => {
     const [orders, setOrders] = useState({});
-    const [confirmDialog, setConfirmDialog] = useState(false); // Để mở hộp thoại xác nhận
-    const [cancelDialog, setCancelDialog] = useState(false); // Để mở hộp thoại hủy
-    const [currentOrderId, setCurrentOrderId] = useState(null); // Để lưu ID đơn hàng đang xác nhận
-    const [productDetails, setProductDetails] = useState(null); // Để lưu thông tin chi tiết sản phẩm
+    const [confirmDialog, setConfirmDialog] = useState(false); // Hộp thoại xác nhận
+    const [cancelDialog, setCancelDialog] = useState(false); // Hộp thoại hủy
+    const [currentOrderId, setCurrentOrderId] = useState(null); // ID đơn hàng đang xử lý
+    const [productDetails, setProductDetails] = useState(null); // Chi tiết sản phẩm
 
     useEffect(() => {
-        fetchOrders((data) => {
-            console.log("Dữ liệu nhận được:", data);
-            setOrders(data);
-        });
+        fetchOrders((data) => setOrders(data));
     }, []);
 
     const handleConfirmStatus = async (orderId) => {
         const result = await confirmOrderStatus(orderId);
         if (result) {
-            alert('Trạng thái đơn hàng đã được cập nhật');
+            alert('Trạng thái đơn hàng đã được cập nhật thành "Đang giao hàng"');
             fetchOrders(setOrders);
         } else {
             alert('Lỗi khi cập nhật trạng thái đơn hàng');
         }
-        setConfirmDialog(false); // Đóng hộp thoại sau khi xác nhận
+        setConfirmDialog(false);
     };
 
     const handleCancelStatus = async (orderId) => {
@@ -35,7 +37,17 @@ const OrderManagerScreen = () => {
         } else {
             alert('Lỗi khi cập nhật trạng thái đơn hàng');
         }
-        setCancelDialog(false); // Đóng hộp thoại sau khi hủy
+        setCancelDialog(false);
+    };
+
+    const handleMarkAsDelivered = async (orderId) => {
+        const result = await markOrderAsDelivered(orderId);
+        if (result) {
+            alert('Trạng thái đơn hàng đã được cập nhật thành "Thành công"');
+            fetchOrders(setOrders);
+        } else {
+            alert('Lỗi khi cập nhật trạng thái thành công');
+        }
     };
 
     const openConfirmDialog = (orderId) => {
@@ -49,14 +61,14 @@ const OrderManagerScreen = () => {
     };
 
     const openProductDetails = (order) => {
-        setProductDetails(order.products); // Lưu thông tin sản phẩm vào trạng thái
+        setProductDetails(order.products);
     };
 
     const closeDialog = () => {
         setConfirmDialog(false);
         setCancelDialog(false);
         setCurrentOrderId(null);
-        setProductDetails(null); // Đóng chi tiết sản phẩm
+        setProductDetails(null);
     };
 
     return (
@@ -83,25 +95,62 @@ const OrderManagerScreen = () => {
                                 <tr key={key}>
                                     <td>{index + 1}</td>
                                     <td>{key}</td>
-                                    <td>{order.orderDate ? new Date(order.orderDate).toLocaleString() : 'N/A'}</td>
-                                    <td>{order.shippingAddress ? order.shippingAddress.nameAddresUser : 'N/A'}</td>
-                                    <td>{order.totalAmount ? `${Number(order.totalAmount).toLocaleString()} VND` : 'N/A'}</td>
+                                    <td>
+                                        {order.orderDate
+                                            ? new Date(order.orderDate).toLocaleString()
+                                            : 'N/A'}
+                                    </td>
+                                    <td>
+                                        {order.shippingAddress
+                                            ? order.shippingAddress.nameAddresUser
+                                            : 'N/A'}
+                                    </td>
+                                    <td>
+                                        {order.totalAmount
+                                            ? `${Number(order.totalAmount).toLocaleString()} VND`
+                                            : 'N/A'}
+                                    </td>
                                     <td>Chuyển khoản</td>
                                     <td>
-                                        <button className={order.orderStatus === 'Đã xác nhận' ? 'confirm' : order.orderStatus === 'Đã hủy' ? 'cancel' : 'pending'}>
+                                        <button
+                                            className={
+                                                order.orderStatus === 'Thành công'
+                                                    ? 'success'
+                                                    : order.orderStatus === 'Đã hủy'
+                                                    ? 'cancel'
+                                                    : 'pending'
+                                            }
+                                        >
                                             {order.orderStatus || 'Chờ xác nhận'}
                                         </button>
                                     </td>
                                     <td className="action-cell">
-                                        <button className="confirm" onClick={() => openConfirmDialog(key)}>
+                                        <button
+                                            className="confirm"
+                                            onClick={() => openConfirmDialog(key)}
+                                        >
                                             Xác nhận
                                         </button>
-                                        <button className="cancel" onClick={() => openCancelDialog(key)}>
+                                        <button
+                                            className="cancel"
+                                            onClick={() => openCancelDialog(key)}
+                                        >
                                             Hủy
                                         </button>
-                                        <button className="details" onClick={() => openProductDetails(order)}>
+                                        <button
+                                            className="details"
+                                            onClick={() => openProductDetails(order)}
+                                        >
                                             Chi tiết
                                         </button>
+                                        {order.orderStatus === 'Đang giao hàng' && (
+                                            <button
+                                                className="success"
+                                                onClick={() => handleMarkAsDelivered(key)}
+                                            >
+                                                Giao thành công
+                                            </button>
+                                        )}
                                     </td>
                                 </tr>
                             );
@@ -120,7 +169,9 @@ const OrderManagerScreen = () => {
                     <div className="dialog-content">
                         <h3>Bạn có chắc chắn muốn xác nhận đơn hàng này?</h3>
                         <div className="dialog-footer">
-                            <button onClick={() => handleConfirmStatus(currentOrderId)}>Đồng ý</button>
+                            <button onClick={() => handleConfirmStatus(currentOrderId)}>
+                                Đồng ý
+                            </button>
                             <button onClick={closeDialog}>Không</button>
                         </div>
                     </div>
@@ -133,7 +184,9 @@ const OrderManagerScreen = () => {
                     <div className="dialog-content">
                         <h3>Bạn có chắc chắn muốn hủy đơn hàng này?</h3>
                         <div className="dialog-footer">
-                            <button onClick={() => handleCancelStatus(currentOrderId)}>Đồng ý</button>
+                            <button onClick={() => handleCancelStatus(currentOrderId)}>
+                                Đồng ý
+                            </button>
                             <button onClick={closeDialog}>Không</button>
                         </div>
                     </div>
@@ -143,24 +196,32 @@ const OrderManagerScreen = () => {
             {/* Hiển thị chi tiết sản phẩm */}
             {productDetails && (
                 <div className="product-details-dialog">
+                    <div className="dialog-overlay" onClick={closeDialog}></div>
                     <div className="dialog-content">
                         <h3>Chi tiết sản phẩm trong đơn hàng</h3>
-                        <ul>
+                        <div className="product-grid">
                             {productDetails.map((product, index) => (
-                                <li key={index}>
-                                    <p>Tên sản phẩm: {product.name}</p>
-                                    <p>Giá: {product.price} VND</p>
-                                    <p>Số lượng: {product.quantity}</p>
-                                </li>
+                                <div key={index} className="product-item">
+                                    <div className="product-image">
+                                        <img
+                                            src={product.imageUrl || '/default-product-image.png'}
+                                            alt={product.name}
+                                        />
+                                    </div>
+                                    <div className="product-info">
+                                        <p><strong>Tên sản phẩm:</strong> {product.name}</p>
+                                        <p><strong>Giá:</strong> {product.price.toLocaleString()} VND</p>
+                                        <p><strong>Số lượng:</strong> {product.quantity}</p>
+                                    </div>
+                                </div>
                             ))}
-                        </ul>
-                        <button onClick={closeDialog}>Đóng</button>
+                        </div>
+                        <button className="close-dialog-btn" onClick={closeDialog}>Đóng</button>
                     </div>
                 </div>
             )}
         </div>
     );
 };
-//loi
 
 export default OrderManagerScreen;

@@ -8,14 +8,13 @@ import LoginScreen from './screes/Login';
 import CompanyScreen from './screes/CompanyScreen';
 import ProductManagement from './screes/ProductScreen';
 import OrderManagerScreen from './screes/OrderManagerScreen';
+import StatisticsScreen from './screes/StatisticsScreen';
 import { getDatabase, ref, update } from 'firebase/database'; // Import Firebase
 
 import ChatBoxScreen from './screes/ChatBoxScreen';
 
 
-function StatisticsManagement() {
-  return <h1>Statistics management</h1>;
-}
+
 
 function Navbar({ onLogout, position }) {
   const navigate = useNavigate();
@@ -170,7 +169,7 @@ function App() {
                 <>
                   <Route path="/product_management" element={<ProductManagement />} />
                   <Route path="/order_management" element={<OrderManagerScreen />} />
-                  <Route path="/statistics_management" element={<StatisticsManagement />} />
+                  <Route path="/statistics_management" element={<StatisticsScreen />} />
                   <Route path="/chat_box" element={<ChatBoxScreen />} />
                 </>
               )}

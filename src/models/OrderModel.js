@@ -23,41 +23,31 @@ export const fetchOrders = (callback) => {
     );
 };
 
-// Hàm cập nhật trạng thái đơn hàng thành "Đang giao hàng"
-export const confirmOrderStatus = async (orderId) => {
+// Hàm cập nhật trạng thái đơn hàng
+export const updateOrderStatus = async (orderId, newStatus) => {
     const orderRef = dbRef(db, `/orders/${orderId}`);
     try {
-        await update(orderRef, { orderStatus: 'Đang giao hàng' });
-        console.log('Trạng thái đơn hàng đã được cập nhật');
+        await update(orderRef, { orderStatus: newStatus });
+        console.log(`Trạng thái đơn hàng đã được cập nhật thành "${newStatus}"`);
         return true;
     } catch (error) {
         console.error('Lỗi khi cập nhật trạng thái:', error);
         return false;
     }
+};
+
+// Hàm cập nhật trạng thái đơn hàng thành "Đang giao hàng"
+export const confirmOrderStatus = async (orderId) => {
+    return updateOrderStatus(orderId, 'Đang giao hàng');
 };
 
 // Hàm cập nhật trạng thái đơn hàng thành "Đã hủy"
 export const cancelOrderStatus = async (orderId) => {
-    const orderRef = dbRef(db, `/orders/${orderId}`);
-    try {
-        await update(orderRef, { orderStatus: 'Đã hủy' });
-        console.log('Trạng thái đơn hàng đã được cập nhật thành "Đã hủy"');
-        return true;
-    } catch (error) {
-        console.error('Lỗi khi cập nhật trạng thái:', error);
-        return false;
-    }
+    return updateOrderStatus(orderId, 'Đã hủy');
 };
 
 // Hàm cập nhật trạng thái đơn hàng thành "Thành công"
 export const markOrderAsDelivered = async (orderId) => {
-    const orderRef = dbRef(db, `/orders/${orderId}`);
-    try {
-        await update(orderRef, { orderStatus: 'Thành công' });
-        console.log('Trạng thái đơn hàng đã được cập nhật thành "Thành công"');
-        return true;
-    } catch (error) {
-        console.error('Lỗi khi cập nhật trạng thái thành công:', error);
-        return false;
-    }
+    return updateOrderStatus(orderId, 'Thành công');
 };
+

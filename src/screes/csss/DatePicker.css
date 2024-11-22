@@ -1,0 +1,21 @@
+.date-picker-container {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    margin-bottom: 20px;
+  }
+  
+  .date-picker {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .date-input {
+    width: 150px;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 14px;
+  }
+  

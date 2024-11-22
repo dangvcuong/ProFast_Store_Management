@@ -37,29 +37,65 @@ canvas {
     max-width: 100%;
     height: auto;
 }
-/* Container chứa các tab */
+
 .tab-navigation {
     margin-bottom: 20px;
     display: flex;
-    justify-content: space-between; /* Căn đều các tab */
+    justify-content: space-between; 
   }
   
-  /* Các tab riêng lẻ */
+  
   .tab {
-    padding: 8px 16px; /* Thu ngắn padding của các tab */
+    padding: 8px 16px; 
     cursor: pointer;
     border: 1px solid #ccc;
     border-radius: 5px;
     
-    flex-grow: 1; /* Tất cả các tab sẽ chia đều không gian */
-    text-align: center; /* Căn giữa nội dung trong tab */
-    font-size: 14px; /* Thu nhỏ font-size nếu cần */
+    flex-grow: 1; 
+    text-align: center; 
+    font-size: 14px; 
   }
   
-  /* Tab khi được chọn */
-  .tab.active {
-    background-color: white; /* Nền trắng khi tab được chọn */
-    color: black; /* Màu chữ đen khi tab được chọn */
+  /* Lớp cho phần thông báo lỗi */
+.error-message {
+    margin-top: 10px; /* Khoảng cách với phần trên */
+    background-color: #ffcccc; /* Màu nền đỏ nhạt */
+    color: #ff0000; /* Màu chữ đỏ */
+    padding: 10px;
+    border-radius: 5px; /* Bo góc */
     font-weight: bold;
-    border: 0.5px solid black; /* Bo viền đen 0.5px */
+    width: auto;
   }
+  
+  /* Lớp cho phần lọc ngày và nút thống kê */
+  .filter-section {
+    display: flex;
+    align-items: center;
+    gap: 10px; /* Khoảng cách giữa các phần tử */
+    margin-bottom: 20px; /* Khoảng cách dưới phần lọc */
+  }
+  
+  .apply-filter-button {
+    padding: 10px 20px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+  }
+  
+  .apply-filter-button:hover {
+    background-color: #45a049;
+  }
+  
+  .tab.active {
+    background-color: white; 
+    color: black; 
+    font-weight: bold;
+    border: 0.5px solid black; 
+  }
+  .tab:hover {
+    background-color: #f0f0f0; 
+    transition: background-color 0.3s ease; 
+}

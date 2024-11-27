@@ -271,8 +271,8 @@ const ProductManagement = () => {
                                 <td>{companies[products[key].id_Hang]?.name || 'N/A'}</td>
                                 <td>{products[key].evaluate}</td>
                                 <td>
-                                    <button onClick={() => handleDelete(products[key].id_SanPham)}>Delete</button>
-                                    <button onClick={() => handleEdit(products[key])}>Edit</button>
+                                    <button onClick={() => handleDelete(products[key].id_SanPham)}>Xóa</button>
+                                    <button onClick={() => handleEdit(products[key])}>Sửa</button>
                                 </td>
                             </tr>
                         ))}

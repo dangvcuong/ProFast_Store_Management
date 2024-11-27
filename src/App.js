@@ -33,11 +33,11 @@ function Navbar({ onLogout, position }) {
   };
 
   const menuItems = [
-    { label: 'Quản lý khách hàng', path: '/customer-management', roles: ['admin'] },
-    { label: 'Quản lý nhân viên', path: '/personnel_management', roles: ['admin'] },
-    { label: 'Quản lý hãng', path: '/firm_management', roles: ['admin'] },
-    { label: 'Quản lý sản phẩm', path: '/product_management', roles: ['admin', 'nv'] },
     { label: 'Quản lý đơn hàng', path: '/order_management', roles: ['admin', 'nv'] },
+    { label: 'Quản lý sản phẩm', path: '/product_management', roles: ['admin', 'nv'] },
+    { label: 'Quản lý hãng', path: '/firm_management', roles: ['admin'] },
+    { label: 'Quản lý nhân viên', path: '/personnel_management', roles: ['admin'] },
+    { label: 'Quản lý khách hàng', path: '/customer-management', roles: ['admin'] },
     { label: 'Quản lý thống kê', path: '/statistics_management', roles: ['admin', 'nv'] },
     { label: 'Chat box', path: '/chat_box', roles: ['admin', 'nv'] },
   ];
@@ -62,9 +62,11 @@ function Navbar({ onLogout, position }) {
         <img
           src={logo}
           alt="logo"
-          style={{ width: 150, height: 150, marginRight: 16 }}
+          style={{ width: 150, height: 150, marginRight: 16, cursor: 'pointer' }}
+          onClick={() => window.location.reload()}  // Thêm sự kiện reload khi nhấn vào logo
         />
       </Toolbar>
+
       <Box sx={{ overflow: 'auto', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', height: '100%', padding: 1 }}>
         <List>
           {filteredMenuItems.map((tab, index) => (

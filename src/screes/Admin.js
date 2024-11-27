@@ -1,13 +1,20 @@
+'use client'
+
 import React, { useState, useEffect } from 'react';
 import { getCompany, deleteCompany, addCompany, updateCompany } from '../models/Company_Model';
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import '../screes/csss/Personnel_management.css';
 
-import '../screes/csss/Personnel_management.css'; // Import file CSS đã tạo
-
-const CompanyScreen = () => {
+export default function CompanyScreen() {
     const [companys, setCompanys] = useState({});
     const [id, setId] = useState('');
     const [name, setName] = useState('');
-    const [searchTerm, setSearchTerm] = useState(''); // Từ khóa tìm kiếm hãng
+    const [searchTerm, setSearchTerm] = useState('');
+    const [dialogOpen, setDialogOpen] = useState(false);
+    const [dialogMessage, setDialogMessage] = useState('');
 
     useEffect(() => {
         loadCompanys();
@@ -20,7 +27,8 @@ const CompanyScreen = () => {
 
     const handleAdd = async () => {
         if (!name) {
-            alert('Vui lòng nhập đầy đủ thông tin');
+            setDialogMessage('Vui lòng nhập đầy đủ thông tin');
+            setDialogOpen(true);
             return;
         }
 
@@ -32,7 +40,8 @@ const CompanyScreen = () => {
 
     const handleUpdate = async () => {
         if (!id || !name) {
-            alert('Vui lòng nhập đầy đủ thông tin');
+            setDialogMessage('Vui lòng nhập đầy đủ thông tin');
+            setDialogOpen(true);
             return;
         }
 
@@ -57,7 +66,6 @@ const CompanyScreen = () => {
         setName('');
     };
 
-    // Hàm chuyển đổi chuỗi có dấu thành không dấu (dùng cho tìm kiếm không phân biệt dấu)
     const removeVietnameseTones = (str) => {
         return str
             .normalize("NFD")
@@ -66,64 +74,79 @@ const CompanyScreen = () => {
             .replace(/Đ/g, "D");
     };
 
-    // Lọc danh sách hãng dựa trên từ khóa tìm kiếm (không phân biệt dấu)
     const filteredCompanies = Object.keys(companys).filter((key) => {
         const companyName = companys[key].name;
         return removeVietnameseTones(companyName.toLowerCase()).includes(removeVietnameseTones(searchTerm.toLowerCase()));
     });
+
     const formatDate = (dateString) => {
         const [day, month, year] = dateString.split('/');
-        const date = new Date(year, month - 1, day); // month - 1 vì tháng bắt đầu từ 0 trong JavaScript
+        const date = new Date(year, month - 1, day);
         return date.toLocaleDateString('vi-VN');
     };
 
     return (
-        <div className="container">
-            <h1>Quản lý hãng</h1>
+        <div className="container p-4">
+            <h1 className="text-2xl font-bold mb-4">Quản lý hãng</h1>
 
-            <input placeholder="Name" value={name} onChange={(e) => setName(e.target.value)} style={{ marginBottom: '10px' }} />
-            <button onClick={handleAdd}>Thêm</button>
-            <button onClick={handleUpdate} disabled={!id}>Cập nhật</button>
+            <div className="mb-4">
+                <Input 
+                    placeholder="Name" 
+                    value={name} 
+                    onChange={(e) => setName(e.target.value)} 
+                    className="mb-2"
+                />
+                <Button onClick={handleAdd} className="mr-2">Thêm</Button>
+                <Button onClick={handleUpdate} disabled={!id}>Cập nhật</Button>
+            </div>
 
-            <h2>Danh sách hãng</h2>
-            <div>
-                <input
+            <h2 className="text-xl font-semibold mb-2">Danh sách hãng</h2>
+            <div className="mb-4">
+                <Input
                     placeholder="Nhập tên hãng cần tìm"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    style={{ width: '30%', padding: '8px', fontSize: '16px', marginBottom: 30, justifyContent: 'right' }}
+                    className="w-full md:w-1/3"
                 />
             </div>
-            <div className="table-container">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Tên</th>
-                            <th>Ngày tạo</th>
-                            <th>Hành động</th>
-                        </tr>
-                    </thead>
-                    <tbody>
+
+            <div className="overflow-x-auto">
+                <Table>
+                    <TableHeader>
+                        <TableRow>
+                            <TableHead>Tên</TableHead>
+                            <TableHead>Ngày tạo</TableHead>
+                            <TableHead>Hành động</TableHead>
+                        </TableRow>
+                    </TableHeader>
+                    <TableBody>
                         {filteredCompanies.map((key) => (
-                            <tr key={key}>
-                                <td>{companys[key].name}</td>
-                                <td>
+                            <TableRow key={key}>
+                                <TableCell>{companys[key].name}</TableCell>
+                                <TableCell>
                                     {companys[key].createdDate
                                         ? formatDate(companys[key].createdDate)
                                         : 'N/A'}
-                                </td>
-                                <td>
-                                    <button onClick={() => handleEdit({ id: key, name: companys[key].name })}>Sửa</button>
-                                    <button onClick={() => handleDelete(key)}>Xóa</button>
-                                </td>
-                            </tr>
+                                </TableCell>
+                                <TableCell>
+                                    <Button onClick={() => handleEdit({ id: key, name: companys[key].name })} className="mr-2">Sửa</Button>
+                                    <Button onClick={() => handleDelete(key)} variant="destructive">Xóa</Button>
+                                </TableCell>
+                            </TableRow>
                         ))}
-                    </tbody>
-                </table>
+                    </TableBody>
+                </Table>
             </div>
+
+            <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Thông báo</DialogTitle>
+                    </DialogHeader>
+                    <p>{dialogMessage}</p>
+                </DialogContent>
+            </Dialog>
         </div>
     );
-};
-
-export default CompanyScreen;
+}
 

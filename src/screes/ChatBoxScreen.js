@@ -8,6 +8,8 @@ const ChatBoxScreen = () => {
     const [chatHistory, setChatHistory] = useState([]);
     const [replyText, setReplyText] = useState('');
     const [userId, setUserID] = useState('');
+    const [nameUser, setNameUser] = useState('');
+    const [imageUser, setImageUser] = useState('');
     const [userData, setUserData] = useState(null);
 
     // Lấy danh sách tin nhắn
@@ -36,7 +38,12 @@ const ChatBoxScreen = () => {
         return () => unsubscribe();
     }, []);
 
-
+    useEffect(() => {
+        if (userData) {
+            setImageUser(userData.image || 'https://via.placeholder.com/100'); // Đặt giá trị mặc định nếu không có ảnh
+            setNameUser(userData.name || 'Không rõ'); // Đặt giá trị mặc định nếu không có tên
+        }
+    }, [userData]);
     // Lấy thông tin người dùng và lịch sử trò chuyện
     useEffect(() => {
         if (selectedMessage) {
@@ -77,6 +84,8 @@ const ChatBoxScreen = () => {
             const newMessage = {
                 id: newMessageRef.key,
                 authorId: userId,
+                imageUser: imageUser,
+                nameUser: nameUser,
                 createdAt: Date.now(),
                 text: replyText.trim(),
                 status: 2,
@@ -93,7 +102,7 @@ const ChatBoxScreen = () => {
         <div style={{ display: 'flex', height: '93vh', fontFamily: 'Arial, sans-serif' }}>
             {/* Sidebar */}
             <div style={{ width: '25%', borderRight: '1px solid #ddd', overflowY: 'scroll', padding: '10px' }}>
-                <h3 style={{ textAlign: 'center', margin: '10px 0' }}>Danh sách tin nhắn</h3>
+                <h3 style={{ textAlign: 'center', margin: '10px 0', backgroundColor: 'white' }}>Danh sách tin nhắn</h3>
                 {messages.length > 0 ? (
                     messages.map((message) => (
                         <div
@@ -143,7 +152,8 @@ const ChatBoxScreen = () => {
                 <hr />
 
                 {/* Chat history */}
-                <div style={{ flex: 1, overflowY: 'scroll', padding: '10px', maxHeight: '70vh' }}>
+                <div style={{ flex: 1, overflowY: 'scroll', padding: '10px', maxHeight: '70vh' }}
+                >
                     {chatHistory.length > 0 ? (
                         chatHistory.map((chat) => (
                             <div
@@ -159,11 +169,29 @@ const ChatBoxScreen = () => {
                                         maxWidth: '60%',
                                         padding: '10px',
                                         borderRadius: '10px',
-                                        backgroundColor: chat.status === 2 ? '#4caf50' : '#fff',
+                                        backgroundColor: chat.status === 2 ? '#2196F3' : '#CCCCCC',
                                         color: chat.status === 2 ? '#fff' : '#000',
                                     }}
                                 >
-                                    <p style={{ margin: 0 }}>{chat.text}</p>
+                                    {/* Hiển thị ảnh nếu có */}
+                                    {chat.imageUrl && (
+                                        <img
+                                            src={chat.imageUrl}
+                                            alt="Chat Attachment"
+                                            style={{
+                                                width: '100%',
+                                                maxWidth: '200px',
+                                                height: 300,
+                                                borderRadius: '8px',
+                                                marginBottom: chat.text ? '10px' : '0',
+                                            }}
+                                        />
+                                    )}
+
+                                    {/* Hiển thị text nếu có */}
+                                    {chat.text && (
+                                        <p style={{ color: chat.status === 2 ? 'white' : '#000', }}>{chat.text}</p>
+                                    )}
                                 </div>
                             </div>
                         ))
@@ -171,6 +199,7 @@ const ChatBoxScreen = () => {
                         <p>Chưa có tin nhắn nào.</p>
                     )}
                 </div>
+
 
                 {/* Input bar */}
                 <div style={{ padding: '10px', display: 'flex', alignItems: 'center', borderTop: '1px solid #ddd' }}>

@@ -39,12 +39,26 @@ export const updateEmployee = async (employee) => {
     }
 };
 
-// Lấy danh sách nhân viên
+// Lấy danh sách nhân viên với position = "nv"
 export const getEmployees = async () => {
     const dbRef = ref(db);
     const snapshot = await get(child(dbRef, 'employees'));
-    return snapshot.exists() ? snapshot.val() : {};
+
+    if (snapshot.exists()) {
+        const employees = snapshot.val();
+        // Lọc nhân viên có position = "nv"
+        const filteredEmployees = Object.entries(employees)
+            .filter(([key, employee]) => employee.position === "nv")
+            .reduce((acc, [key, employee]) => {
+                acc[key] = employee;
+                return acc;
+            }, {});
+        return filteredEmployees;
+    }
+
+    return {};
 };
+
 
 // Xóa một nhân viên
 export const deleteEmployee = async (id) => {

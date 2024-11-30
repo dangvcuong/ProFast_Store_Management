@@ -2,13 +2,14 @@ import React, { useEffect, useState } from 'react';
 import { getDatabase, ref, onValue, update } from "firebase/database";
 import UserModel from '../models/KhachHang_Model'; // Import the user model
 import { app } from '../firebaseConfig'; // Import Firebase app configuration
-
+import '../screes/csss/OrderManagerScreen.css';
 const Customer_managenments = () => {
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
-
+    const [currentOrderId, setCurrentOrderId] = useState(null);
+    const [confirmDialog, setConfirmDialog] = useState(false);
     useEffect(() => {
         const db = getDatabase(app);
         const usersRef = ref(db, 'users');
@@ -51,16 +52,7 @@ const Customer_managenments = () => {
     const deactivateUser = async (userId) => {
         const db = getDatabase();
         const userRef = ref(db, `users/${userId}`);
-        const confirmLogout = window.confirm("Bạn có chắc chắn muốn tố cáo tài khoản này không?");
-        if (confirmLogout) {
-            try {
-                await update(userRef, { status: 'Ngừng hoạt động' });
-                console.log('Trạng thái người dùng đã được cập nhật thành Ngừng hoạt động.');
-            } catch (error) {
-                console.error('Lỗi khi cập nhật trạng thái người dùng:', error);
-            }
-        }
-
+        await update(userRef, { status: 'Ngừng hoạt động' });
     };
 
     if (loading) {
@@ -84,7 +76,10 @@ const Customer_managenments = () => {
     const filteredUsers = users.filter(user =>
         removeVietnameseTones(user.userModel.name.toLowerCase()).includes(removeVietnameseTones(searchTerm.toLowerCase()))
     );
-
+    const closeDialog = () => {
+        setConfirmDialog(false);
+        setCurrentOrderId(null);
+    };
     return (
         <div style={{ margin: 20 }}>
             <h1>Quản lý khách hàng</h1>
@@ -97,7 +92,7 @@ const Customer_managenments = () => {
                 />
             </div>
             <div className="table-container">
-                <table border="1" cellPadding="10" style={{ borderCollapse: 'collapse', width: '100%' }}>
+                <table >
                     <thead>
                         <tr>
                             <th>Tên</th>
@@ -111,13 +106,20 @@ const Customer_managenments = () => {
                     <tbody>
                         {filteredUsers.map((user, index) => (
                             <tr key={index}>
-                                <td style={{ textAlign: 'center', verticalAlign: 'middle' }}>{user.userModel.name}</td>
-                                <td style={{ textAlign: 'center', verticalAlign: 'middle' }}>{user.userModel.email}</td>
-                                <td style={{ textAlign: 'center', verticalAlign: 'middle' }}>{user.userModel.phoneNumber}</td>
-                                <td style={{ textAlign: 'center', verticalAlign: 'middle' }}>{user.userModel.dateCreated}</td>
-                                <td style={{ textAlign: 'center', verticalAlign: 'middle' }}>{user.userModel.status}</td>
-                                <td style={{ textAlign: 'center', verticalAlign: 'middle' }}>
-                                    <button onClick={() => deactivateUser(user.userModel.id)}>
+                                <td>{user.userModel.name}</td>
+                                <td style={{
+                                    wordBreak: 'break-word',
+                                    whiteSpace: 'normal',
+                                }} >{user.userModel.email}</td>
+                                <td >{user.userModel.phoneNumber}</td>
+                                <td >{user.userModel.dateCreated}</td>
+                                <td >{user.userModel.status}</td>
+                                <td >
+                                    <button onClick={() => { setCurrentOrderId(user.userModel.id); setConfirmDialog(true) }} style={{
+                                        color: 'white',
+                                        backgroundColor: '#2196F3',
+                                        width: 150,
+                                    }}>
                                         Khóa tài khoản
                                     </button>
                                 </td>
@@ -125,6 +127,24 @@ const Customer_managenments = () => {
                         ))}
                     </tbody>
                 </table>
+                {confirmDialog && (
+                    <div className="confirmation-dialog">
+                        <div className="dialog-content">
+                            <h3>Xác nhận khóa tài khoản này?</h3>
+
+                            <div className="dialog-footer">
+                                <button onClick={() => { deactivateUser(currentOrderId); closeDialog(); }} style={{
+                                    color: 'white',
+                                    backgroundColor: '#2196F3',
+                                }}>Đồng ý</button>
+                                <button onClick={closeDialog} style={{
+                                    color: 'white',
+                                    backgroundColor: '#2196F3',
+                                }}>Không</button>
+                            </div>
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     );

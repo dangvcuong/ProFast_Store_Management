@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { getCompany, deleteCompany, addCompany, updateCompany } from '../models/Company_Model';
+import '../screes/csss/Product.css';
 
-import '../screes/csss/Personnel_management.css'; // Import file CSS đã tạo
 
 const CompanyScreen = () => {
     const [companys, setCompanys] = useState({});
     const [id, setId] = useState('');
     const [name, setName] = useState('');
+    const [ngay, setNgay] = useState('');
     const [searchTerm, setSearchTerm] = useState(''); // Từ khóa tìm kiếm hãng
-
+    const [confirmDialog, setConfirmDialog] = useState(false);
+    const [currentOrderId, setCurrentOrderId] = useState(null);
     useEffect(() => {
         loadCompanys();
     }, []);
@@ -36,7 +38,7 @@ const CompanyScreen = () => {
             return;
         }
 
-        const company = { id, name };
+        const company = { id, name, createdDate: ngay };
         await updateCompany(company);
         loadCompanys();
         resetForm();
@@ -45,6 +47,7 @@ const CompanyScreen = () => {
     const handleEdit = (company) => {
         setId(company.id);
         setName(company.name);
+        setNgay(company.createdDate);
     };
 
     const handleDelete = async (id) => {
@@ -77,50 +80,116 @@ const CompanyScreen = () => {
         return date.toLocaleDateString('vi-VN');
     };
 
+    const closeDialog = () => {
+        setConfirmDialog(false);
+        setCurrentOrderId(null);
+    };
+
     return (
-        <div className="container">
-            <h1>Quản lý hãng</h1>
+        <div className="body">
+            <h1>Quản lý danh mục</h1>
 
-            <input placeholder="Name" value={name} onChange={(e) => setName(e.target.value)} style={{ marginBottom: '10px' }} />
-            <button onClick={handleAdd}>Thêm</button>
-            <button onClick={handleUpdate} disabled={!id}>Cập nhật</button>
+            <input placeholder="Nhập tên danh mục" value={name} onChange={(e) => setName(e.target.value)} style={{
+                marginBottom: '10px',
+                flex: 1,
+                padding: '10px',
+                border: '1px solid #ccc',
+                borderRadius: '4px',
+                fontSize: '14px',
+                boxSizing: 'border-box',
+            }} />
+            <button onClick={handleAdd} style={{
+                marginLeft: '10px',
+                padding: '10px',
+                backgroundColor: '#2196F3',
+                border: '1px solid #ccc',
+                borderRadius: '4px',
+                fontSize: '14px',
+                color: 'white',
+                boxSizing: 'border-box',
+            }}>Thêm</button>
+            <button onClick={handleUpdate} disabled={!id} style={{
+                marginLeft: '10px',
+                padding: '10px',
+                backgroundColor: '#2196F3',
+                border: '1px solid #ccc',
+                borderRadius: '4px',
+                fontSize: '14px',
+                color: 'white',
+                boxSizing: 'border-box',
+            }}>Cập nhật</button>
 
-            <h2>Danh sách hãng</h2>
+
             <div>
                 <input
-                    placeholder="Nhập tên hãng cần tìm"
+                    placeholder="Nhập tên danh mục cần tìm"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     style={{ width: '30%', padding: '8px', fontSize: '16px', marginBottom: 30, justifyContent: 'right' }}
                 />
             </div>
-            <div className="table-container">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Tên</th>
-                            <th>Ngày tạo</th>
-                            <th>Hành động</th>
+
+            <table className="table-container">
+                <thead>
+                    <tr>
+                        <th>Tên</th>
+                        <th>Ngày tạo</th>
+                        <th>Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {filteredCompanies.map((key) => (
+                        <tr key={key}>
+                            <td>{companys[key].name}</td>
+                            <td>
+                                {companys[key].createdDate
+                                    ? formatDate(companys[key].createdDate)
+                                    : 'N/A'}
+                            </td>
+                            <td>
+                                <button onClick={() => handleEdit({ id: key, name: companys[key].name, createdDate: companys[key].createdDate })} style={{
+
+                                    padding: '10px',
+                                    backgroundColor: '#2196F3',
+                                    border: '1px solid #ccc',
+                                    borderRadius: '4px',
+                                    fontSize: '14px',
+                                    color: 'white',
+                                    boxSizing: 'border-box',
+                                }}>Sửa</button>
+                                <button onClick={() => { setCurrentOrderId(key); setConfirmDialog(true) }} style={{
+                                    marginLeft: '10px',
+                                    padding: '10px',
+                                    backgroundColor: '#2196F3',
+                                    border: '1px solid #ccc',
+                                    borderRadius: '4px',
+                                    fontSize: '14px',
+                                    color: 'white',
+                                    boxSizing: 'border-box',
+                                }}>Xóa</button>
+                            </td>
                         </tr>
-                    </thead>
-                    <tbody>
-                        {filteredCompanies.map((key) => (
-                            <tr key={key}>
-                                <td>{companys[key].name}</td>
-                                <td>
-                                    {companys[key].createdDate
-                                        ? formatDate(companys[key].createdDate)
-                                        : 'N/A'}
-                                </td>
-                                <td>
-                                    <button onClick={() => handleEdit({ id: key, name: companys[key].name })}>Sửa</button>
-                                    <button onClick={() => handleDelete(key)}>Xóa</button>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
+                    ))}
+                </tbody>
+            </table>
+            {confirmDialog && (
+                <div className="confirmation-dialog">
+                    <div className="dialog-content">
+                        <h3>Xác nhận xóa danh mục này không?</h3>
+
+                        <div className="dialog-footer">
+                            <button onClick={() => { handleDelete(currentOrderId); closeDialog(); }} style={{
+                                color: 'white',
+                                backgroundColor: '#2196F3',
+                            }}>Đồng ý</button>
+                            <button onClick={closeDialog} style={{
+                                color: 'white',
+                                backgroundColor: '#2196F3',
+                            }}>Không</button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

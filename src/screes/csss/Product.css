@@ -30,8 +30,10 @@ table {
     margin-top: 10px;
 }
 
+
+
 thead th {
-    background-color: #4CAF50;
+    background-color: #2196F3;
     color: white;
     padding: 10px;
     text-align: left;
@@ -51,51 +53,7 @@ tbody tr:hover {
     transition: background-color 0.3s;
 }
 
-.action-cell {
-    width: 200px;
-    padding: 10px;
-    text-align: center;
-}
-
-/* Kiểu cho select */
-.action-select {
-    width: 100%;
-    padding: 8px;
-    font-size: 16px;
-    border-radius: 4px;
-    border: 1px solid #ccc;
-    background-color: #f9f9f9;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-/* Khi người dùng hover lên select */
-.action-select:hover {
-    border-color: #007bff;
-    background-color: #f1f1f1;
-}
-
-/* Kiểu cho option */
-.action-select option {
-    padding: 10px;
-    font-size: 16px;
-}
-
-/* Disable option (xử lý cho các option bị vô hiệu hóa) */
-.action-select option:disabled {
-    background-color: #e0e0e0;
-    color: #999;
-    cursor: not-allowed;
-}
-
-/* Kiểu cho select khi đang được focus */
-.action-select:focus {
-    border-color: #007bff;
-    outline: none;
-    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
-}
-
-button {
+*/ button {
     width: 100px;
     padding: 8px 12px;
     border: none;
@@ -198,12 +156,10 @@ button:disabled {
 table tbody {
     width: 100%;
     display: block;
-
+    height: 340px;
     overflow-y: auto;
     overflow-x: hidden;
 }
-
-
 
 table {
     width: 100%;

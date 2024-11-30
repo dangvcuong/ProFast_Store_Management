@@ -114,7 +114,7 @@ const StatisticsManagement = () => {
   };
 
   return (
-    <div className="container">
+    <div className="body">
       <h1>Quản lý Thống kê</h1>
 
       {/* Lọc ngày và nút thống kê nằm cùng một hàng */}
@@ -123,8 +123,8 @@ const StatisticsManagement = () => {
         <DatePickerComponent onDateChange={handleDateChange} />
 
         {/* Nút "Thống kê" */}
-        <button 
-          className="apply-filter-button" 
+        <button
+          className="apply-filter-button"
           onClick={handleApplyFilter}
         >
           Thống kê
@@ -136,14 +136,14 @@ const StatisticsManagement = () => {
 
       {/* Tab Navigation */}
       <div className="tab-navigation">
-        <button 
-          className={`tab ${selectedTab === 'revenue' ? 'active' : ''}`} 
+        <button
+          className={`tab ${selectedTab === 'revenue' ? 'active' : ''}`}
           onClick={() => setSelectedTab('revenue')}
         >
           Doanh thu
         </button>
-        <button 
-          className={`tab ${selectedTab === 'products' ? 'active' : ''}`} 
+        <button
+          className={`tab ${selectedTab === 'products' ? 'active' : ''}`}
           onClick={() => setSelectedTab('products')}
         >
           Sản phẩm bán chạy
@@ -151,12 +151,12 @@ const StatisticsManagement = () => {
       </div>
 
       {/* Biểu đồ */}
-      <div className="chart-container">
+      <div className="chart-container" style={{ height: '500px', overflowY: 'auto' }}>
         {isLoading ? (
           <p>Đang tải dữ liệu...</p>
         ) : selectedTab === 'revenue' && revenueData ? (
-          <Bar 
-            data={revenueData} 
+          <Bar
+            data={revenueData}
             options={{
               plugins: {
                 tooltip: {
@@ -170,16 +170,18 @@ const StatisticsManagement = () => {
                   color: '#000',
                   anchor: 'end',
                   align: 'top',
-                  formatter: (value) => value > 0 ? `${value} triệu` : '',
+                  formatter: (value) => (value > 0 ? `${value} triệu` : ''),
                   font: {
                     weight: 'bold',
                   },
                 },
               },
+              maintainAspectRatio: false, // Quan trọng: Không giữ tỉ lệ mặc định để biểu đồ phù hợp với chiều cao
             }}
+            height={500} // Thiết lập chiều cao cụ thể
           />
         ) : selectedTab === 'products' && productData ? (
-          <Bar 
+          <Bar
             data={productData}
             options={{
               plugins: {
@@ -194,18 +196,21 @@ const StatisticsManagement = () => {
                   color: '#000',
                   anchor: 'end',
                   align: 'top',
-                  formatter: (value) => value > 0 ? `${value} sản phẩm` : '',
+                  formatter: (value) => (value > 0 ? `${value} sản phẩm` : ''),
                   font: {
                     weight: 'bold',
                   },
                 },
               },
+              maintainAspectRatio: false, // Quan trọng
             }}
+            height={500} // Thiết lập chiều cao cụ thể
           />
         ) : (
           <p>Chọn ngày và bấm "Thống kê" để xem dữ liệu.</p>
         )}
       </div>
+
     </div>
   );
 };

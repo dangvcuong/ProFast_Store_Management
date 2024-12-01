@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { fetchOrders, confirmOrderStatus, cancelOrderStatus, updateOrderStatus } from '../models/OrderModel';
 import '../screes/csss/OrderManagerScreen.css';
-
+import { db } from '../firebaseConfig';
+import { ref, get, update } from 'firebase/database';
 const OrderManagerScreen = () => {
     const [orders, setOrders] = useState({});
     const [filteredOrders, setFilteredOrders] = useState([]);
@@ -44,6 +45,108 @@ const OrderManagerScreen = () => {
     }, []);
 
 
+    const updateProductSoldQuantity = async (productId, quantityToAdd) => {
+        try {
+            // Lấy reference tới sản phẩm trong Firebase
+            const productRef = ref(db, `products/${productId}`);
+
+            // Lấy dữ liệu của sản phẩm
+            const snapshot = await get(productRef);
+            console.log("ID SNPAM: ", productRef);
+
+            // Kiểm tra xem sản phẩm có tồn tại trong DB không
+            if (snapshot.exists()) {
+                // Đảm bảo giá trị hiện tại là một số
+                let currentQuantitySold = Number(snapshot.val().quantitysold || 0);
+                let currentQuantity = Number(snapshot.val().quantity || 0);
+
+
+                // Đảm bảo giá trị cần cộng thêm là một số
+                const quantityToAddNumber = Number(quantityToAdd);
+
+                if (isNaN(quantityToAddNumber)) {
+                    console.error(`Số lượng cần cộng không hợp lệ: ${quantityToAdd}`);
+                    return false;
+                }
+
+                // Cộng thêm số lượng bán mới
+                const newQuantitySold = currentQuantitySold + quantityToAddNumber;
+                const newsoluong = currentQuantity - quantityToAddNumber;
+                // Cập nhật lại giá trị quantitysold trong Firebase
+                await update(productRef, {
+                    quantitysold: newQuantitySold,
+                    quantity: newsoluong,
+                });
+
+                console.log(`Cập nhật thành công số lượng bán cho sản phẩm ${productId}`);
+                return true;
+            } else {
+                console.error(`Sản phẩm không tồn tại: ${productId}`);
+                return false;
+            }
+        } catch (error) {
+            console.error(`Lỗi khi cập nhật số lượng bán cho sản phẩm ${productId}:`, error.message);
+            return false;
+        }
+    };
+
+    const handleMarkAsDelivered = async (orderId) => {
+        try {
+            // Tìm đơn hàng theo orderId
+            const order = orders.find(order => order.orderId === orderId);
+
+            // Kiểm tra nếu đơn hàng không tồn tại
+            if (!order) {
+                console.error(`Không tìm thấy đơn hàng với ID: ${orderId}`);
+                alert('Không tìm thấy đơn hàng. Vui lòng kiểm tra lại.');
+                return;
+            }
+
+            // Kiểm tra trạng thái đơn hàng
+            if (order.orderStatus !== 'Đang giao hàng') {
+                alert('Chỉ có thể cập nhật trạng thái đơn hàng "Đang giao hàng" thành "Thành công".');
+                return;
+            }
+
+            // Cập nhật trạng thái đơn hàng
+            const result = await updateOrderStatus(orderId, 'Thành công');
+            if (!result) {
+                alert('Lỗi khi cập nhật trạng thái đơn hàng');
+                return;
+            }
+
+            // Cập nhật số lượng bán được cho từng sản phẩm
+            const updateResults = [];
+            if (order.products && Array.isArray(order.products)) {
+                for (const product of order.products) {
+                    try {
+                        const updateResult = await updateProductSoldQuantity(product.id, product.quantity);
+                        updateResults.push(updateResult);
+                    } catch (error) {
+                        console.error(`Lỗi khi cập nhật số lượng bán cho sản phẩm ${product.id}:`, error);
+                        updateResults.push(false);
+                    }
+                }
+            } else {
+                console.error('Danh sách sản phẩm không hợp lệ hoặc không tồn tại.');
+                alert('Không thể cập nhật số lượng bán vì danh sách sản phẩm bị lỗi.');
+                return;
+            }
+
+            // Kiểm tra kết quả cập nhật
+            if (updateResults.every(result => result)) {
+                alert('Trạng thái đơn hàng đã được cập nhật thành "Thành công" và số lượng bán được đã được cập nhật.');
+            } else {
+                alert('Lỗi khi cập nhật số lượng bán được cho một số sản phẩm. Vui lòng kiểm tra lại.');
+            }
+
+            // Làm mới danh sách đơn hàng
+            fetchOrders(setOrders);
+        } catch (error) {
+            console.error('Lỗi khi xử lý cập nhật đơn hàng:', error);
+            alert('Đã xảy ra lỗi trong quá trình xử lý. Vui lòng thử lại.');
+        }
+    };
 
 
     // Lọc danh sách đơn hàng theo ngày
@@ -64,34 +167,27 @@ const OrderManagerScreen = () => {
 
     const handleConfirmStatus = async (orderId) => {
         await confirmOrderStatus(orderId);
+        updateOrdersList()
     };
 
     const handleCancelStatus = async (orderId) => {
         await cancelOrderStatus(orderId);
 
-
+        updateOrdersList()
     };
 
-    const handleMarkAsDelivered = async (orderId) => {
-        const order = orders.find(order => order.orderId === orderId);
-        if (order.orderStatus !== 'Đang giao hàng') {
-            alert('Chỉ có thể cập nhật trạng thái đơn hàng "Đang giao hàng" thành "Thành công".');
-            return;
-        }
-        await updateOrderStatus(orderId, 'Thành công');
 
+
+    const updateOrdersList = () => {
+        fetchOrders((data) => {
+            const updatedOrders = Object.keys(data).map(key => ({
+                ...data[key],
+                orderId: key,
+            }));
+            setOrders(updatedOrders);
+            filterOrdersByDate(selectedDate, updatedOrders);
+        });
     };
-
-    // const updateOrdersList = () => {
-    //     fetchOrders((data) => {
-    //         const updatedOrders = Object.keys(data).map(key => ({
-    //             ...data[key],
-    //             orderId: key,
-    //         }));
-    //         setOrders(updatedOrders);
-    //         filterOrdersByDate(selectedDate, updatedOrders);
-    //     });
-    // };
 
 
     const openProductDetails = (order) => {
@@ -140,7 +236,7 @@ const OrderManagerScreen = () => {
             </div>
 
             {/* Bảng hiển thị danh sách đơn hàng */}
-            <table>
+            <table style={{ width: "100%", height: 100, bordercollapse: "collapse" }}>
                 <thead>
                     <tr>
                         <th>STT</th>
@@ -206,100 +302,108 @@ const OrderManagerScreen = () => {
 
                 </tbody>
             </table>
-            {confirmDialog && (
-                <div className="confirmation-dialog">
-                    <div className="dialog-content">
-                        <h3>Xác nhận đơn hàng #{currentOrderId}?</h3>
+            {
+                confirmDialog && (
+                    <div className="confirmation-dialog">
+                        <div className="dialog-content">
+                            <h3>Xác nhận đơn hàng #{currentOrderId}?</h3>
 
-                        <div className="dialog-footer">
-                            <button onClick={() => { handleConfirmStatus(currentOrderId); closeDialog(); }} style={{
-                                color: 'white',
-                                backgroundColor: '#2196F3',
-                            }}>Đồng ý</button>
-                            <button onClick={closeDialog} style={{
-                                color: 'white',
-                                backgroundColor: '#2196F3',
-                            }}>Không</button>
+                            <div className="dialog-footer">
+                                <button onClick={() => { handleConfirmStatus(currentOrderId); closeDialog(); }} style={{
+                                    color: 'white',
+                                    backgroundColor: '#2196F3',
+                                }}>Đồng ý</button>
+                                <button onClick={closeDialog} style={{
+                                    color: 'white',
+                                    backgroundColor: '#2196F3',
+                                }}>Không</button>
+                            </div>
                         </div>
                     </div>
-                </div>
-            )}
-            {confirmDialogSx && (
-                <div className="confirmation-dialog">
-                    <div className="dialog-content">
-                        <h3>Bạn có chắc chắn đơn hàng này #{currentOrderId} đã giao thành công?</h3>
+                )
+            }
+            {
+                confirmDialogSx && (
+                    <div className="confirmation-dialog">
+                        <div className="dialog-content">
+                            <h3>Bạn có chắc chắn đơn hàng này #{currentOrderId} đã giao thành công?</h3>
 
-                        <div className="dialog-footer">
-                            <button onClick={() => { handleMarkAsDelivered(currentOrderId); closeDialog(); }} style={{
-                                color: 'white',
-                                backgroundColor: '#2196F3',
-                            }}>Đồng ý</button>
-                            <button onClick={closeDialog} style={{
-                                color: 'white',
-                                backgroundColor: '#2196F3',
-                            }}>Không</button>
+                            <div className="dialog-footer">
+                                <button onClick={() => { handleMarkAsDelivered(currentOrderId); closeDialog(); }} style={{
+                                    color: 'white',
+                                    backgroundColor: '#2196F3',
+                                }}>Đồng ý</button>
+                                <button onClick={closeDialog} style={{
+                                    color: 'white',
+                                    backgroundColor: '#2196F3',
+                                }}>Không</button>
+                            </div>
                         </div>
                     </div>
-                </div>
-            )}
+                )
+            }
 
-            {cancelDialog && (
-                <div className="confirmation-dialog">
-                    <div className="dialog-content">
-                        <h3>Bạn có chắc chắn muốn hủy đơn hàng này #{currentOrderId}?</h3>
-                        <div className="dialog-footer">
-                            <button onClick={() => { handleCancelStatus(currentOrderId); closeDialog(); }} style={{
-                                color: 'white',
-                                backgroundColor: '#2196F3',
-                            }}>Đồng ý</button>
-                            <button onClick={closeDialog} style={{
-                                color: 'white',
-                                backgroundColor: '#2196F3',
-                            }}>Không</button>
+            {
+                cancelDialog && (
+                    <div className="confirmation-dialog">
+                        <div className="dialog-content">
+                            <h3>Bạn có chắc chắn muốn hủy đơn hàng này #{currentOrderId}?</h3>
+                            <div className="dialog-footer">
+                                <button onClick={() => { handleCancelStatus(currentOrderId); closeDialog(); }} style={{
+                                    color: 'white',
+                                    backgroundColor: '#2196F3',
+                                }}>Đồng ý</button>
+                                <button onClick={closeDialog} style={{
+                                    color: 'white',
+                                    backgroundColor: '#2196F3',
+                                }}>Không</button>
+                            </div>
                         </div>
                     </div>
-                </div>
-            )}
+                )
+            }
 
-            {productDetails && (
-                <div className="product-details-dialog">
-                    <div className="dialog-content">
-                        <h3>Chi tiết sản phẩm trong đơn hàng</h3>
-                        <ul>
-                            {productDetails && (
-                                <div className="product-details-dialog">
-                                    <div className="dialog-overlay" onClick={closeDialog}></div>
-                                    <div className="dialog-content">
-                                        <h3>Chi tiết sản phẩm trong đơn hàng</h3>
-                                        <div className="product-grid">
-                                            {productDetails.map((product, index) => (
-                                                <div key={index} className="product-item">
-                                                    <div className="product-image">
-                                                        <img
-                                                            src={product.imageUrl || '/default-product-image.png'}
-                                                            alt={product.name}
-                                                        />
+            {
+                productDetails && (
+                    <div className="product-details-dialog">
+                        <div className="dialog-content">
+                            <h3>Chi tiết sản phẩm trong đơn hàng</h3>
+                            <ul>
+                                {productDetails && (
+                                    <div className="product-details-dialog">
+                                        <div className="dialog-overlay" onClick={closeDialog}></div>
+                                        <div className="dialog-content">
+                                            <h3>Chi tiết sản phẩm trong đơn hàng</h3>
+                                            <div className="product-grid">
+                                                {productDetails.map((product, index) => (
+                                                    <div key={index} className="product-item">
+                                                        <div className="product-image">
+                                                            <img
+                                                                src={product.imageUrl || '/default-product-image.png'}
+                                                                alt={product.name}
+                                                            />
+                                                        </div>
+                                                        <div className="product-info">
+                                                            <p><strong>Tên sản phẩm:</strong> {product.name}</p>
+                                                            <p><strong>Giá:</strong> {product.price.toLocaleString()} VND</p>
+                                                            <p><strong>Số lượng:</strong> {product.quantity}</p>
+                                                        </div>
                                                     </div>
-                                                    <div className="product-info">
-                                                        <p><strong>Tên sản phẩm:</strong> {product.name}</p>
-                                                        <p><strong>Giá:</strong> {product.price.toLocaleString()} VND</p>
-                                                        <p><strong>Số lượng:</strong> {product.quantity}</p>
-                                                    </div>
-                                                </div>
-                                            ))}
+                                                ))}
+                                            </div>
+                                            <button className="close-dialog-btn" onClick={closeDialog} style={{
+                                                color: 'white',
+                                                backgroundColor: '#2196F3',
+                                            }}>Đóng</button>
                                         </div>
-                                        <button className="close-dialog-btn" onClick={closeDialog} style={{
-                                            color: 'white',
-                                            backgroundColor: '#2196F3',
-                                        }}>Đóng</button>
                                     </div>
-                                </div>
-                            )}
-                        </ul>
-                        <button onClick={closeDialog}>Đóng</button>
+                                )}
+                            </ul>
+                            <button onClick={closeDialog}>Đóng</button>
+                        </div>
                     </div>
-                </div>
-            )}
+                )
+            }
         </div >
     );
 };

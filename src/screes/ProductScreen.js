@@ -20,9 +20,10 @@ const ProductManagement = () => {
     const [imageUrl, setImageUrl] = useState('');
     const [selectedCompany, setSelectedCompany] = useState('');
     const [searchTerm, setSearchTerm] = useState('');
-    const quantitysold = 0;
+    const [quantitysold, setQuantitysold] = useState('');
     const [currentOrderId, setCurrentOrderId] = useState(null);
     const [confirmDialog, setConfirmDialog] = useState(false);
+    const quantitysoldNew = 0;
     useEffect(() => {
         loadProductsRealtime();
         loadCompanies();
@@ -93,7 +94,7 @@ const ProductManagement = () => {
                 evaluate,
                 id_Hang,
                 imageUrl: uploadedImageUrl,
-                quantitysold: Number(quantitysold),
+                quantitysold: Number(quantitysoldNew),
             };
 
             await addProduct(product);
@@ -146,6 +147,7 @@ const ProductManagement = () => {
         setEvaluate(product.evaluate);
         setId_Hang(product.id_Hang);
         setImageUrl(product.imageUrl);
+        setQuantitysold(product.quantitysold);
     };
 
     const handleDelete = async (id_SanPham) => {

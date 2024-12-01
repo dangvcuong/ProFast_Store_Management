@@ -23,6 +23,7 @@ export const addProduct = async (product) => {
         name: product.name,
         price: product.price,
         quantity: product.quantity,
+        quantitysold: product.quantitysold,
         dateOfEntry: new Date().toISOString(),  // Tự động tạo ngày nhập với định dạng ISO
         describe: product.describe,
         evaluate: product.evaluate,

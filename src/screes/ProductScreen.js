@@ -5,7 +5,7 @@ import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { db } from '../firebaseConfig';
 import { ref as dbRef, onValue } from 'firebase/database';
 import { getCompany } from '../models/Company_Model';
-
+import '../screes/csss/Product.css';
 const ProductManagement = () => {
     const [id, setId] = useState('');
     const [products, setProducts] = useState({});
@@ -20,7 +20,10 @@ const ProductManagement = () => {
     const [imageUrl, setImageUrl] = useState('');
     const [selectedCompany, setSelectedCompany] = useState('');
     const [searchTerm, setSearchTerm] = useState('');
-    const quantitysold = 0;
+    const [quantitysold, setQuantitysold] = useState('');
+    const [currentOrderId, setCurrentOrderId] = useState(null);
+    const [confirmDialog, setConfirmDialog] = useState(false);
+    const quantitysoldNew = 0;
     useEffect(() => {
         loadProductsRealtime();
         loadCompanies();
@@ -67,7 +70,7 @@ const ProductManagement = () => {
 
         try {
             if (!image) {
-                alert('Please select a product image');
+                alert('Vui lòng chọn ảnh');
                 return;
             }
 
@@ -78,7 +81,7 @@ const ProductManagement = () => {
             }
 
             if (!name || !price || !quantity || !describe || !evaluate || !id_Hang) {
-                alert('Please enter all required information');
+                alert('Vui lòng nhập đầy đủ thông tin');
                 return;
             }
 
@@ -91,15 +94,15 @@ const ProductManagement = () => {
                 evaluate,
                 id_Hang,
                 imageUrl: uploadedImageUrl,
-                quantitysold: Number(quantitysold),
+                quantitysold: Number(quantitysoldNew),
             };
 
             await addProduct(product);
             resetForm();
-            alert("Product added successfully!");
+            alert("Thêm sản phẩm mới thành công!");
         } catch (error) {
             console.error("Error adding product:", error);
-            alert("Error adding product. Please try again.");
+            alert("Lỗi vui lòng thêm lại.");
         }
     };
 
@@ -144,6 +147,7 @@ const ProductManagement = () => {
         setEvaluate(product.evaluate);
         setId_Hang(product.id_Hang);
         setImageUrl(product.imageUrl);
+        setQuantitysold(product.quantitysold);
     };
 
     const handleDelete = async (id_SanPham) => {
@@ -181,35 +185,156 @@ const ProductManagement = () => {
 
         return matchesCompany && matchesSearchTerm;
     });
-
+    const closeDialog = () => {
+        setConfirmDialog(false);
+        setCurrentOrderId(null);
+    };
     return (
-        <div className="container">
-            <h1>Product Management</h1>
-            <div style={{ display: 'flex', gap: '250px' }}>
+        <div className="body">
+            <h1>Quản lý sản phẩm</h1>
+            <div style={{ display: 'flex', gap: '200px' }}>
                 <div style={{ flex: 1 }}>
 
 
-                    <input placeholder="Product Name" value={name} onChange={(e) => setName(e.target.value)} style={{ marginBottom: '10px' }} />
-                    <input placeholder="Price" type="number" value={price} onChange={(e) => setPrice(e.target.value)} style={{ marginBottom: '10px' }} />
-                    <input placeholder="Quantity" type="number" value={quantity} onChange={(e) => setQuantity(e.target.value)} style={{ marginBottom: '10px', }} />
-                    <input placeholder="Description" value={describe} onChange={(e) => setDescribe(e.target.value)} style={{ marginBottom: '10px' }} />
-                    <input placeholder="Rating" type="number" value={evaluate} onChange={(e) => setEvaluate(e.target.value)} style={{ marginBottom: '10px' }} />
+                    <div style={{ display: 'flex', gap: '10px' }}>
+                        <input
+                            placeholder="Nhập tên sản phẩm"
+                            value={name}
+                            onChange={(e) => setName(e.target.value)}
+                            style={{
+                                marginBottom: '10px',
+                                flex: 1,
+                                padding: '10px',
+                                border: '1px solid #ccc',
+                                borderRadius: '4px',
+                                fontSize: '14px',
+                                boxSizing: 'border-box',
+                            }}
+                        />
+                        <input
+                            placeholder="Nhập giá"
+                            type="number"
+                            value={price}
+                            onChange={(e) => setPrice(e.target.value)}
+                            style={{
+                                marginBottom: '10px',
+                                flex: 1,
+                                padding: '10px',
+                                border: '1px solid #ccc',
+                                borderRadius: '4px',
+                                fontSize: '14px',
+                                boxSizing: 'border-box',
+                            }}
+                        />
+                    </div>
 
-                    <select value={id_Hang} onChange={(e) => setId_Hang(e.target.value)} style={{ width: "40%", padding: '8px', fontSize: '12px' }}>
-                        <option value="">Chọn hãng</option>
-                        {companies && Object.keys(companies).map((key) => (
-                            <option key={key} value={key}>
-                                {companies[key].name}
-                            </option>
-                        ))}
-                    </select>
-                    <div style={{ height: 5 }}></div>
-                    <input type="file" onChange={handleImageChange} />
-                    <button onClick={handleAdd}>Add</button>
-                    <button onClick={handleUpdate} disabled={!id}>Update</button>
+                    <div style={{ display: 'flex', gap: '10px' }}>
+                        <input
+                            placeholder="Nhập số lượng"
+                            type="number"
+                            value={quantity}
+                            onChange={(e) => setQuantity(e.target.value)}
+                            style={{
+                                marginBottom: '10px',
+                                flex: 1,
+                                padding: '10px',
+                                border: '1px solid #ccc',
+                                borderRadius: '4px',
+                                fontSize: '14px',
+                                boxSizing: 'border-box',
+                            }}
+                        />
+                        <input
+                            placeholder="Nhập mô tả"
+                            value={describe}
+                            onChange={(e) => setDescribe(e.target.value)}
+                            style={{
+                                marginBottom: '10px',
+                                flex: 1,
+                                padding: '10px',
+                                border: '1px solid #ccc',
+                                borderRadius: '4px',
+                                fontSize: '14px',
+                                boxSizing: 'border-box',
+                            }}
+                        />
+                    </div>
+
+                    <div style={{ display: 'flex', gap: '10px' }}>
+                        <input
+                            placeholder="Đánh giá"
+                            type="number"
+                            value={evaluate}
+                            onChange={(e) => setEvaluate(e.target.value)}
+                            style={{
+                                marginBottom: '10px',
+                                flex: 1,
+                                padding: '10px',
+                                border: '1px solid #ccc',
+                                borderRadius: '4px',
+                                fontSize: '14px',
+                                boxSizing: 'border-box',
+                            }}
+                        />
+                        <select value={id_Hang} onChange={(e) => setId_Hang(e.target.value)} style={{
+                            marginBottom: '10px',
+                            flex: 1,
+                            padding: '10px',
+                            borderRadius: '4px',
+                            fontSize: '14px',
+                            boxSizing: 'border-box',
+                        }}>
+                            <option value="">Chọn hãng</option>
+                            {companies && Object.keys(companies).map((key) => (
+                                <option key={key} value={key}>
+                                    {companies[key].name}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+
+                    <div style={{ display: 'flex', gap: '10px' }}>
+                        <input type="file" onChange={handleImageChange} style={{
+                            marginBottom: '10px',
+                            width: '49%',
+                            padding: 10,
+                            justifyContent: 'center',
+                            alignContent: 'center',
+                            border: '1px solid #ccc',
+                            borderRadius: '4px',
+                            boxSizing: 'border-box',
+                        }} />
+
+                        <div style={{ marginTop: 10, flex: 1, }}>
+                            <button onClick={handleAdd} style={{
+                                marginRight: '10px',
+                                padding: '10px',
+                                backgroundColor: '#2196F3',
+                                border: '1px solid #ccc',
+                                borderRadius: '4px',
+                                fontSize: '14px',
+                                color: 'white',
+                                boxSizing: 'border-box',
+                            }}>Thêm mới </button>
+
+                            <button onClick={handleUpdate} disabled={!id} style={{
+                                marginBottom: '10px',
+                                padding: '10px',
+                                border: '1px solid #ccc',
+                                borderRadius: '4px',
+                                fontSize: '14px',
+                                color: 'white',
+                                backgroundColor: '#2196F3',
+                                boxSizing: 'border-box',
+                            }}>Cập nhật</button>
+                        </div>
+                    </div>
+
+
+
                 </div>
                 <div style={{ flex: 1 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '40px', marginTop: '15%' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '20px', }}>
                         <div style={{}}>
                             <h3>Lọc sản phẩm theo hãng</h3>
                             <select
@@ -231,54 +356,78 @@ const ProductManagement = () => {
                                 placeholder="Nhập tên sản phẩm cần tìm"
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
-                                style={{ width: '100%', padding: '8px', fontSize: '16px' }}
+                                style={{ width: '90%', padding: '8px', fontSize: '16px' }}
                             />
                         </div>
                     </div>
                 </div>
             </div>
 
-            <h2>Product List</h2>
-            <div className="table-container">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Image</th>
-                            <th>Name</th>
-                            <th>Price</th>
-                            <th>Quantity</th>
-                            <th>Description</th>
-                            <th>Company</th>
-                            <th>Rating</th>
-                            <th>Actions</th>
+
+
+            <table className="table-container">
+                <thead>
+                    <tr>
+                        <th>Ảnh sản phẩm</th>
+                        <th>Tên sản phẩm</th>
+                        <th>Giá</th>
+                        <th>Số lượng</th>
+                        <th>Mô tả</th>
+                        <th>Danh mục</th>
+                        <th>Đánh giá</th>
+                        <th>Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody className='tablecao'>
+                    {filteredProducts.map((key) => (
+                        <tr key={key}>
+                            <td>
+                                <img
+                                    src={products[key].imageUrl}
+                                    alt="Product"
+                                    style={{ width: '100px', height: '100px' }}
+                                    onError={(e) => e.target.src = "https://via.placeholder.com/50"}
+                                />
+                            </td>
+                            <td>{products[key].name}</td>
+                            <td>{products[key].price}</td>
+                            <td>{products[key].quantity}</td>
+                            <td>{products[key].describe}</td>
+                            <td>{companies[products[key].id_Hang]?.name || 'N/A'}</td>
+                            <td>{products[key].evaluate}</td>
+                            <td>
+                                <button onClick={() => { setCurrentOrderId(products[key].id_SanPham); setConfirmDialog(true) }} style={{
+                                    color: 'white',
+                                    backgroundColor: '#2196F3',
+                                }}>Xóa</button>
+                                <div style={{ height: 5 }}></div>
+                                <button onClick={() => handleEdit(products[key])} style={{
+                                    color: 'white',
+                                    backgroundColor: '#2196F3',
+                                }}>Sửa</button>
+                            </td>
                         </tr>
-                    </thead>
-                    <tbody>
-                        {filteredProducts.map((key) => (
-                            <tr key={key}>
-                                <td>
-                                    <img
-                                        src={products[key].imageUrl}
-                                        alt="Product"
-                                        style={{ width: '100px', height: '100px' }}
-                                        onError={(e) => e.target.src = "https://via.placeholder.com/50"}
-                                    />
-                                </td>
-                                <td>{products[key].name}</td>
-                                <td>{products[key].price}</td>
-                                <td>{products[key].quantity}</td>
-                                <td>{products[key].describe}</td>
-                                <td>{companies[products[key].id_Hang]?.name || 'N/A'}</td>
-                                <td>{products[key].evaluate}</td>
-                                <td>
-                                    <button onClick={() => handleDelete(products[key].id_SanPham)}>Xóa</button>
-                                    <button onClick={() => handleEdit(products[key])}>Sửa</button>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
+                    ))}
+                </tbody>
+            </table>
+            {confirmDialog && (
+                <div className="confirmation-dialog">
+                    <div className="dialog-content">
+                        <h3>Xác nhận xóa sản phẩm này không?</h3>
+
+                        <div className="dialog-footer">
+                            <button onClick={() => { handleDelete(currentOrderId); closeDialog(); }} style={{
+                                color: 'white',
+                                backgroundColor: '#2196F3',
+                            }}>Đồng ý</button>
+                            <button onClick={closeDialog} style={{
+                                color: 'white',
+                                backgroundColor: '#2196F3',
+                            }}>Không</button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

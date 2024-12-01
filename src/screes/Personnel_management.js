@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { addEmployee, updateEmployee, getEmployees, deleteEmployee } from '../models/Employee_Model';
 
-import '../screes/csss/Personnel_management.css'; // Import file CSS đã tạo
+import '../screes/csss/OrderManagerScreen.css';
 
 const Personnel_management = () => {
     const [employees, setEmployees] = useState({});
@@ -14,7 +14,8 @@ const Personnel_management = () => {
     const [position, setPosition] = useState('')
     const [createdDate, setCreatedDate] = useState('');
     const [searchTerm, setSearchTerm] = useState(''); // Từ khóa tìm kiếm hãng
-
+    const [currentOrderId, setCurrentOrderId] = useState(null);
+    const [confirmDialog, setConfirmDialog] = useState(false);
     useEffect(() => {
         loadEmployees();
     }, []);
@@ -88,27 +89,117 @@ const Personnel_management = () => {
         const employeesName = employees[key]?.name || ''; // Sử dụng '' nếu name là undefined
         return removeVietnameseTones(employeesName.toLowerCase()).includes(removeVietnameseTones(searchTerm.toLowerCase()));
     });
+
+    const closeDialog = () => {
+        setConfirmDialog(false);
+        setCurrentOrderId(null);
+    };
     return (
-        <div className="container">
+        <div className="body">
             <h1>Quản lý nhân viên</h1>
+            <div style={{ display: 'flex', gap: '200px' }}>
+                <div style={{ flex: 1 }}>
+                    <div style={{ display: 'flex', gap: '10px' }}>
+                        <input placeholder="Name" value={name} onChange={(e) => setName(e.target.value)} style={{
+                            marginBottom: '10px',
+                            flex: 1,
+                            padding: '10px',
+                            border: '1px solid #ccc',
+                            borderRadius: '4px',
+                            fontSize: '14px',
+                            boxSizing: 'border-box',
+                        }} />
+                        <input placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} style={{
+                            marginBottom: '10px',
+                            flex: 1,
+                            padding: '10px',
+                            border: '1px solid #ccc',
+                            borderRadius: '4px',
+                            fontSize: '14px',
+                            boxSizing: 'border-box',
+                        }} />
+                    </div>
+                    <div style={{ display: 'flex', gap: '10px' }}>
+                        <input placeholder="Phone Number" value={phoneNumber} onChange={(e) => setPhoneNumber(e.target.value)} style={{
+                            marginBottom: '10px',
+                            flex: 1,
+                            padding: '10px',
+                            border: '1px solid #ccc',
+                            borderRadius: '4px',
+                            fontSize: '14px',
+                            boxSizing: 'border-box',
+                        }} />
+                        <input placeholder="UserName" type="username" value={username} onChange={(e) => setuserName(e.target.value)} style={{
+                            marginBottom: '10px',
+                            flex: 1,
+                            padding: '10px',
+                            border: '1px solid #ccc',
+                            borderRadius: '4px',
+                            fontSize: '14px',
+                            boxSizing: 'border-box',
+                        }} />
+                    </div>
 
-            <input placeholder="Name" value={name} onChange={(e) => setName(e.target.value)} style={{ marginBottom: '10px' }} />
-            <input placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} style={{ marginBottom: '10px' }} />
-            <input placeholder="Phone Number" value={phoneNumber} onChange={(e) => setPhoneNumber(e.target.value)} style={{ marginBottom: '10px' }} />
-            <input placeholder="UserName" type="username" value={username} onChange={(e) => setuserName(e.target.value)} style={{ marginBottom: '10px' }} />
-            <input placeholder="Password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} style={{ marginBottom: '10px', }} />
+                    <div style={{ display: 'flex', gap: '10px' }}>
+                        <input placeholder="Password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} style={{
+                            marginBottom: '10px',
+                            padding: 10,
+                            width: "49%",
+                            border: '1px solid #ccc',
+                            borderRadius: '4px',
+                            fontSize: '14px',
+                            boxSizing: 'border-box',
+                        }} />
+                        <div style={{ flex: 1 }}>
+                            <button onClick={handleAdd} style={{
+                                marginRight: '10px',
+                                padding: '10px',
+                                backgroundColor: '#2196F3',
+                                border: '1px solid #ccc',
+                                borderRadius: '4px',
+                                fontSize: '14px',
+                                color: 'white',
+                                boxSizing: 'border-box',
+                            }}>Thêm</button>
+                            <button onClick={handleUpdate} disabled={!id} style={{
+                                marginBottom: '10px',
+                                padding: '10px',
+                                border: '1px solid #ccc',
+                                borderRadius: '4px',
+                                fontSize: '14px',
+                                color: 'white',
+                                backgroundColor: '#2196F3',
+                                boxSizing: 'border-box',
+                            }}>Cập nhật</button>
+                        </div>
+                    </div>
+                </div>
+                <div style={{ flex: 1 }}>
+                    <h3>Tìm kiếm</h3>
+                    <input
+                        placeholder="Nhập tên nhân viên cần tìm"
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        style={{
+                            width: '100%',
+                            marginBottom: '10px',
+                            flex: 1,
+                            padding: '10px',
+                            border: '1px solid #ccc',
+                            borderRadius: '4px',
+                            fontSize: '14px',
+                            boxSizing: 'border-box',
+                        }}
+                    />
+                </div>
+            </div>
 
-            <button onClick={handleAdd}>Thêm</button>
-            <button onClick={handleUpdate} disabled={!id}>Cập nhật</button>
 
-            <h2>Danh sách nhân viên</h2>
+
+
+
             <div>
-                <input
-                    placeholder="Nhập tên nhân viên cần tìm"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    style={{ width: '30%', padding: '8px', fontSize: '16px', marginBottom: 30, justifyContent: 'right' }}
-                />
+
             </div>
             <div className="table-container">
                 <table>
@@ -120,28 +211,58 @@ const Personnel_management = () => {
                             <th>Tên đăng nhập</th>
                             <th>Ngày tạo</th>
                             <th>Trạng thái</th>
-                            <th>Hành động</th>
+                            <th>Thao tác</th>
                         </tr>
                     </thead>
                     <tbody>
                         {filterEdemployees.map((key) => (
                             <tr key={key}>
                                 <td>{employees[key].name}</td>
-                                <td>{employees[key].email}</td>
+                                <td style={{
+                                    wordWrap: 'break-word', // Cho phép nội dung ngắt từ
+                                    wordBreak: 'break-word', // Ngắt từ dài nếu cần
+                                    whiteSpace: 'normal', // Cho phép nội dung xuống dòng
+                                }}>{employees[key].email}</td>
                                 <td>{employees[key].phoneNumber}</td>
                                 <td>{employees[key].username}</td>
                                 <td>{employees[key].createdDate}</td>
                                 <td>{employees[key].status}</td>
                                 <td>
-                                    <button onClick={() => handleDelete(employees[key].id)}>Xóa</button>
-                                    <button onClick={() => handleEdit(employees[key])}>Sửa</button>
+                                    <button onClick={() => { setCurrentOrderId(employees[key].id); setConfirmDialog(true) }} style={{
+                                        color: 'white',
+                                        backgroundColor: '#2196F3',
+                                    }}>Xóa</button>
+                                    <div style={{ height: 5 }}></div>
+                                    <button onClick={() => handleEdit(employees[key])} style={{
+                                        color: 'white',
+                                        backgroundColor: '#2196F3',
+                                    }}>Sửa</button>
                                 </td>
                             </tr>
                         ))}
                     </tbody>
                 </table>
+
+                {confirmDialog && (
+                    <div className="confirmation-dialog">
+                        <div className="dialog-content">
+                            <h3>Xác nhận xóa nhân viên này không?</h3>
+
+                            <div className="dialog-footer">
+                                <button onClick={() => { handleDelete(currentOrderId); closeDialog(); }} style={{
+                                    color: 'white',
+                                    backgroundColor: '#2196F3',
+                                }}>Đồng ý</button>
+                                <button onClick={closeDialog} style={{
+                                    color: 'white',
+                                    backgroundColor: '#2196F3',
+                                }}>Không</button>
+                            </div>
+                        </div>
+                    </div>
+                )}
             </div>
-        </div>
+        </div >
     );
 };
 

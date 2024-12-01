@@ -7,13 +7,17 @@ const LoginScreen = ({ onLoginSuccess }) => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [errorMessage, setErrorMessage] = useState(null);
-
+    const [ten, setTen] = useState();
+    const [pass, setPass] = useState();
     const handleLogin = async (username, password) => {
         if (username === "" || password === "") {
-            alert("Vui lòng nhập đầy đủ thông tin"); 
+            setTen("Vui lòng nhập đầy đủ thông tin");
+            setPass("Vui lòng nhập đầy đủ thông tin");
         } else {
-            if (username === "admin" || password === "admin") {
+            setTen("");
+            if (username === "admin" && password === "admin") {
                 onLoginSuccess("admin");
+
                 return;
             }
             try {
@@ -27,10 +31,10 @@ const LoginScreen = ({ onLoginSuccess }) => {
                         await updateUserStatus(userData.id, "online");
                         onLoginSuccess(userData.position, userData.id); // Gửi thêm userData.id
                     } else {
-                        alert("Mật khẩu không chính xác!");
+                        setPass("Mật khẩu không chính xác!");
                     }
                 } else {
-                    alert("Tên đăng nhập không đúng.");
+                    setPass("Tên đăng nhập hoặc mật khẩu không đúng.");
                 }
             } catch (error) {
                 console.error("Lỗi khi lấy dữ liệu người dùng: ", error);
@@ -50,20 +54,25 @@ const LoginScreen = ({ onLoginSuccess }) => {
                 <Text style={styles.logoText}>ProFast</Text>
                 <Text style={styles.subtitle}>Good to see you again</Text>
                 <TextInput
-                    placeholder="Your Username"
+                    placeholder="Nhập tên đăng nhập"
                     value={username}
                     onChangeText={setUsername}
                     style={styles.input}
                     keyboardType="name-phone-pad"
                 />
+
+                {ten && <Text style={styles.errorText}>{ten}</Text>}
+                <View style={{ height: 10 }}></View>
                 <TextInput
-                    placeholder="Your password"
+                    placeholder="Nhập mật khẩu"
                     value={password}
                     onChangeText={setPassword}
                     secureTextEntry
                     style={styles.input}
                 />
+                {pass && <Text style={styles.errorText}>{pass}</Text>}
                 {errorMessage && <Text style={styles.errorText}>{errorMessage}</Text>}
+                <View style={{ height: 10 }}></View>
                 <TouchableOpacity onPress={handleSubmit} style={styles.button}>
                     <Text style={styles.buttonText}>Sign in</Text>
                 </TouchableOpacity>
@@ -87,6 +96,7 @@ const styles = StyleSheet.create({
         width: '30%',
         borderWidth: 1,
         borderColor: 'black',
+        backgroundColor: "#33CCFF",
         borderRadius: 10,
         padding: 20,
         alignItems: 'center'
@@ -109,7 +119,7 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderRadius: 8,
         paddingHorizontal: 15,
-        marginBottom: 20,
+        marginBottom: 5,
         backgroundColor: '#fff',
         fontSize: 16,
     },
@@ -128,7 +138,6 @@ const styles = StyleSheet.create({
     },
     errorText: {
         color: 'red',
-        marginBottom: 20,
     },
 });
 

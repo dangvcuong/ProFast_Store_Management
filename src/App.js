@@ -35,7 +35,7 @@ function Navbar({ onLogout, position }) {
   const menuItems = [
     { label: 'Quản lý đơn hàng', path: '/order_management', roles: ['admin', 'nv'] },
     { label: 'Quản lý sản phẩm', path: '/product_management', roles: ['admin', 'nv'] },
-    { label: 'Quản lý hãng', path: '/firm_management', roles: ['admin'] },
+    { label: 'Quản lý danh mục', path: '/firm_management', roles: ['admin'] },
     { label: 'Quản lý nhân viên', path: '/personnel_management', roles: ['admin'] },
     { label: 'Quản lý khách hàng', path: '/customer-management', roles: ['admin'] },
     { label: 'Quản lý thống kê', path: '/statistics_management', roles: ['admin', 'nv'] },
@@ -155,11 +155,13 @@ function App() {
 
   return (
     <Router>
+
       {isLoggedIn.isLoggedIn ? (
         <>
           <Navbar onLogout={handleLogout} position={isLoggedIn.position} />
           <Box sx={{ p: 3, ml: 30 }}>
             <Routes>
+              <Route path="/" element={<OrderManagerScreen />} />
               {isLoggedIn.position === 'admin' && (
                 <>
                   <Route path="/customer-management" element={<CustomerManagement />} />

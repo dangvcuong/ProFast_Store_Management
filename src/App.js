@@ -9,6 +9,7 @@ import CompanyScreen from './screes/CompanyScreen';
 import ProductManagement from './screes/ProductScreen';
 import OrderManagerScreen from './screes/OrderManagerScreen';
 import StatisticsScreen from './screes/StatisticsScreen';
+import Vorcher from './screes/Vorcher';
 import { getDatabase, ref, update } from 'firebase/database'; // Import Firebase
 
 import ChatBoxScreen from './screes/ChatBoxScreen';
@@ -36,6 +37,7 @@ function Navbar({ onLogout, position }) {
     { label: 'Quản lý đơn hàng', path: '/order_management', roles: ['admin', 'nv'] },
     { label: 'Quản lý sản phẩm', path: '/product_management', roles: ['admin', 'nv'] },
     { label: 'Quản lý danh mục', path: '/firm_management', roles: ['admin'] },
+    { label: 'Quản lý mã ưu đãi', path: '/vorcher', roles: ['admin'] },
     { label: 'Quản lý nhân viên', path: '/personnel_management', roles: ['admin'] },
     { label: 'Quản lý khách hàng', path: '/customer-management', roles: ['admin'] },
     { label: 'Quản lý thống kê', path: '/statistics_management', roles: ['admin', 'nv'] },
@@ -167,6 +169,7 @@ function App() {
                   <Route path="/customer-management" element={<CustomerManagement />} />
                   <Route path="/personnel_management" element={<PersonnelManagement />} />
                   <Route path="/firm_management" element={<CompanyScreen />} />
+                  <Route path="/vorcher" element={<Vorcher />} />
                 </>
               )}
               {(isLoggedIn.position === 'admin' || isLoggedIn.position === 'nv') && (

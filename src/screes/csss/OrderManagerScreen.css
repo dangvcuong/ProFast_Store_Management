@@ -1,5 +1,3 @@
-/* OrderManagerScreen.css */
-
 body {
     font-family: Arial, sans-serif;
     background-color: #f9f9f9;
@@ -57,7 +55,7 @@ tbody tr:hover {
     text-align: center;
 }
 
-/* Kiểu cho select */
+
 .action-select {
     width: 100%;
     padding: 8px;
@@ -69,7 +67,7 @@ tbody tr:hover {
     transition: all 0.3s ease;
 }
 
-/* Khi người dùng hover lên select */
+
 .action-select:hover {
     border-color: #007bff;
     background-color: #f1f1f1;
@@ -81,14 +79,14 @@ tbody tr:hover {
     font-size: 16px;
 }
 
-/* Disable option (xử lý cho các option bị vô hiệu hóa) */
+
 .action-select option:disabled {
     background-color: #e0e0e0;
     color: #999;
     cursor: not-allowed;
 }
 
-/* Kiểu cho select khi đang được focus */
+
 .action-select:focus {
     border-color: #007bff;
     outline: none;
@@ -210,7 +208,7 @@ table {
     border-collapse: collapse;
     margin-top: 10px;
     table-layout: auto;
-    /* Cho phép bảng tự động điều chỉnh chiều rộng các cột */
+
 }
 
 table thead,

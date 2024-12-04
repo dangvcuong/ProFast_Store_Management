@@ -51,7 +51,7 @@ const LoginScreen = ({ onLoginSuccess }) => {
     return (
         <View style={styles.container}>
             <View style={styles.box1}>
-                <Text style={styles.logoText}>ProFast</Text>
+                <Text style={styles.logoText}>GroFast</Text>
                 <Text style={styles.subtitle}>Good to see you again</Text>
                 <TextInput
                     placeholder="Nhập tên đăng nhập"

@@ -56,29 +56,29 @@ canvas {
   font-size: 14px;
 }
 
-/* Lớp cho phần thông báo lỗi */
+
 .error-message {
   margin-top: 10px;
-  /* Khoảng cách với phần trên */
+
   background-color: #ffcccc;
-  /* Màu nền đỏ nhạt */
+
   color: #ff0000;
-  /* Màu chữ đỏ */
+
   padding: 10px;
   border-radius: 5px;
-  /* Bo góc */
+
   font-weight: bold;
   width: auto;
 }
 
-/* Lớp cho phần lọc ngày và nút thống kê */
+
 .filter-section {
   display: flex;
   align-items: center;
   gap: 10px;
-  /* Khoảng cách giữa các phần tử */
+
   margin-bottom: 20px;
-  /* Khoảng cách dưới phần lọc */
+
 }
 
 .apply-filter-button {

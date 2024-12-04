@@ -189,6 +189,24 @@ const ProductManagement = () => {
         setConfirmDialog(false);
         setCurrentOrderId(null);
     };
+
+
+    const [expanded, setExpanded] = useState({});
+
+    // Hàm kiểm tra nếu mô tả dài
+    const isDescriptionLong = (description) => {
+        // Định nghĩa chiều dài tối đa cho mô tả ngắn
+        const maxLength = 100; 
+        return description.length > maxLength;
+    };
+
+    const toggleDescription = (id) => {
+        setExpanded((prevState) => ({
+            ...prevState,
+            [id]: !prevState[id],
+        }));
+    };
+    
     return (
         <div className="body">
             <h1>Quản lý sản phẩm</h1>
@@ -392,7 +410,16 @@ const ProductManagement = () => {
                             <td>{products[key].name}</td>
                             <td>{products[key].price}</td>
                             <td>{products[key].quantity}</td>
-                            <td>{products[key].describe}</td>
+                            <td>
+                                <div className={`product-description ${expanded[products[key].id_SanPham] ? 'expanded' : ''}`}>
+                                    {products[key].describe}
+                                </div>
+                                {isDescriptionLong(products[key].describe) && (
+                                    <button className="toggle-btn" onClick={() => toggleDescription(products[key].id_SanPham)}>
+                                        {expanded[products[key].id_SanPham] ? 'Thu gọn' : 'Xem thêm'}
+                                    </button>
+                                )}
+                            </td>
                             <td>{companies[products[key].id_Hang]?.name || 'N/A'}</td>
                             <td>{products[key].evaluate}</td>
                             <td>

@@ -100,7 +100,7 @@ const Personnel_management = () => {
             <div style={{ display: 'flex', gap: '200px' }}>
                 <div style={{ flex: 1 }}>
                     <div style={{ display: 'flex', gap: '10px' }}>
-                        <input placeholder="Name" value={name} onChange={(e) => setName(e.target.value)} style={{
+                        <input placeholder="Tên nhân viên" value={name} onChange={(e) => setName(e.target.value)} style={{
                             marginBottom: '10px',
                             flex: 1,
                             padding: '10px',
@@ -120,7 +120,7 @@ const Personnel_management = () => {
                         }} />
                     </div>
                     <div style={{ display: 'flex', gap: '10px' }}>
-                        <input placeholder="Phone Number" value={phoneNumber} onChange={(e) => setPhoneNumber(e.target.value)} style={{
+                        <input placeholder="Số điện thoại" value={phoneNumber} onChange={(e) => setPhoneNumber(e.target.value)} style={{
                             marginBottom: '10px',
                             flex: 1,
                             padding: '10px',
@@ -129,7 +129,7 @@ const Personnel_management = () => {
                             fontSize: '14px',
                             boxSizing: 'border-box',
                         }} />
-                        <input placeholder="UserName" type="username" value={username} onChange={(e) => setuserName(e.target.value)} style={{
+                        <input placeholder="Tên đăng nhập" type="username" value={username} onChange={(e) => setuserName(e.target.value)} style={{
                             marginBottom: '10px',
                             flex: 1,
                             padding: '10px',
@@ -141,7 +141,7 @@ const Personnel_management = () => {
                     </div>
 
                     <div style={{ display: 'flex', gap: '10px' }}>
-                        <input placeholder="Password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} style={{
+                        <input placeholder="Mật khẩu" type="password" value={password} onChange={(e) => setPassword(e.target.value)} style={{
                             marginBottom: '10px',
                             padding: 10,
                             width: "49%",

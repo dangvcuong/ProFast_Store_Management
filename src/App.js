@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, useNavigate } from 'react-router-dom';
 import { Box, Toolbar, Drawer, List, ListItem, ListItemText } from '@mui/material';
 import logo from './images/grofast.png';
@@ -14,12 +14,119 @@ import { getDatabase, ref, update } from 'firebase/database'; // Import Firebase
 
 import ChatBoxScreen from './screes/ChatBoxScreen';
 
-
-
+import { db } from './firebaseConfig';
+import { ref as dbRef, onValue } from 'firebase/database';
 
 function Navbar({ onLogout, position }) {
   const navigate = useNavigate();
   const [selectedTab, setSelectedTab] = React.useState('');
+
+
+  //Thông báo tin nhắn
+  useEffect(() => {
+    // Kiểm tra quyền thông báo
+    if ("Notification" in window) {
+      Notification.requestPermission()
+        .then((permission) => {
+          if (permission !== "granted") {
+            console.warn("Notification permission not granted");
+          }
+        })
+        .catch((error) => console.error("Notification request error:", error));
+    }
+
+    const messagesRef = dbRef(db, "chats/");
+    const unsubscribe = onValue(messagesRef, handleNewMessages);
+
+    return () => unsubscribe(); // Hủy lắng nghe khi component unmount
+  }, []);
+  const handleNewMessages = (snapshot) => {
+    const data = snapshot.val();
+    if (!data) return;
+
+    Object.keys(data).forEach((chatId) => {
+      const messages = Object.values(data[chatId]?.messages || {});
+      messages.forEach((message) => {
+        if (message.status === 1 && message.trangThai === "Chưa xem") {
+          // Hiển thị thông báo cho từng tin nhắn chưa xem
+          showNotification({
+            nameUser: message.nameUser || "Không rõ",
+            text: message.text || "Tin nhắn mới",
+            imageUser: message.imageUser || "https://via.placeholder.com/50",
+          });
+        }
+      });
+    });
+  };
+  const showNotification = (message) => {
+    if ("Notification" in window && Notification.permission === "granted") {
+      new Notification("Tin nhắn mới", {
+        body: `${message.nameUser}: ${message.text}`,
+        icon: message.imageUser,
+      });
+    }
+  };
+
+
+
+  // Lắng nghe thay đổi trong Firebase Realtime Database (Đơn hàng)
+  // const [notifiedOrders, setNotifiedOrders] = useState(new Set()); // Dùng Set để lưu trữ các ID đơn hàng đã thông báo
+
+  // useEffect(() => {
+  //   // Kiểm tra quyền thông báo
+  //   if ("Notification" in window) {
+  //     Notification.requestPermission()
+  //       .then((permission) => {
+  //         if (permission !== "granted") {
+  //           console.warn("Notification permission not granted");
+  //         }
+  //       })
+  //       .catch((error) => console.error("Notification request error:", error));
+  //   }
+
+  //   // Lắng nghe thay đổi trong Firebase Realtime Database (Đơn hàng)
+  //   const ordersRef = dbRef(db, "orders/"); // Giả sử bạn lưu đơn hàng trong 'orders/'
+  //   const unsubscribe = onValue(ordersRef, handleNewOrders);
+
+  //   // Hủy lắng nghe khi component unmount
+  //   return () => unsubscribe();
+  // }, []);
+
+  // // Hàm xử lý khi có đơn hàng mới
+  // const handleNewOrders = (snapshot) => {
+  //   const data = snapshot.val();
+  //   if (!data) return;
+
+  //   // Duyệt qua các đơn hàng
+  //   Object.keys(data).forEach((orderId) => {
+  //     const order = data[orderId];
+
+  //     // Kiểm tra nếu đơn hàng có trạng thái là "Đang chờ xác nhận" và chưa được thông báo
+  //     if (order.orderStatus === "Đang chờ xác nhận" && !notifiedOrders.has(orderId)) {
+  //       // Hiển thị thông báo cho đơn hàng mới
+  //       showNotifications({
+  //         orderId: orderId,
+  //         customerName: order.customerName || "Khách hàng mới",
+  //         orderDetails: order.details || "Chi tiết đơn hàng chưa có",
+  //       });
+
+  //       // Thêm ID đơn hàng vào mảng notifiedOrders để tránh thông báo lại
+  //       setNotifiedOrders((prev) => new Set(prev).add(orderId));
+  //     }
+  //   });
+  // };
+
+  // // Hàm hiển thị thông báo
+  // const showNotifications = (order) => {
+  //   if ("Notification" in window && Notification.permission === "granted") {
+  //     new Notification("Đơn hàng mới", {
+  //       body: `Đơn hàng của ${order.customerName}: ${order.orderDetails}`,
+  //       icon: "https://via.placeholder.com/50", // Bạn có thể thay bằng icon cho đơn hàng
+  //     });
+  //   }
+  // };
+
+
 
   const handleLogoutClick = () => {
     const confirmLogout = window.confirm("Bạn có chắc chắn muốn đăng xuất không?");

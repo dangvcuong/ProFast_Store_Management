@@ -191,7 +191,7 @@ const OrderManagerScreen = () => {
 
 
     const openProductDetails = (order) => {
-        setProductDetails(order.products);
+        setProductDetails(order);
     };
 
     const closeDialog = () => {
@@ -243,7 +243,7 @@ const OrderManagerScreen = () => {
                         <th>Mã đơn hàng</th>
                         <th>Ngày tạo</th>
                         <th>Người mua</th>
-                        <th>Giá</th>
+                        <th>Tổng tiền</th>
                         <th>Thanh toán</th>
                         <th>Trạng thái</th>
                         <th>Thao tác</th>
@@ -363,47 +363,45 @@ const OrderManagerScreen = () => {
                 )
             }
 
-            {
-                productDetails && (
-                    <div className="product-details-dialog">
-                        <div className="dialog-content">
-                            <h3>Chi tiết sản phẩm trong đơn hàng</h3>
-                            <ul>
-                                {productDetails && (
-                                    <div className="product-details-dialog">
-                                        <div className="dialog-overlay" onClick={closeDialog}></div>
-                                        <div className="dialog-content">
-                                            <h3>Chi tiết sản phẩm trong đơn hàng</h3>
-                                            <div className="product-grid">
-                                                {productDetails.map((product, index) => (
-                                                    <div key={index} className="product-item">
-                                                        <div className="product-image">
-                                                            <img
-                                                                src={product.imageUrl || '/default-product-image.png'}
-                                                                alt={product.name}
-                                                            />
-                                                        </div>
-                                                        <div className="product-info">
-                                                            <p><strong>Tên sản phẩm:</strong> {product.name}</p>
-                                                            <p><strong>Giá:</strong> {product.price.toLocaleString()} VND</p>
-                                                            <p><strong>Số lượng:</strong> {product.quantity}</p>
-                                                        </div>
-                                                    </div>
-                                                ))}
-                                            </div>
-                                            <button className="close-dialog-btn" onClick={closeDialog} style={{
-                                                color: 'white',
-                                                backgroundColor: '#2196F3',
-                                            }}>Đóng</button>
-                                        </div>
+            
+            {/* Product details dialog */}
+            {productDetails && (
+                <div className="product-details-dialog">
+                    <div className="dialog-overlay" onClick={closeDialog}></div>
+                    <div className="dialog-content">
+                        <h3>Chi tiết đơn hàng #{productDetails.orderId}</h3>
+                        <div className="order-info">
+                            <p><strong>Tên khách hàng:</strong> {productDetails.shippingAddress?.nameAddresUser || 'N/A'}</p>
+                            <p><strong>Số điện thoại:</strong> {productDetails.shippingAddress?.phoneAddresUser || 'N/A'}</p>
+                            <p><strong>Ngày đặt:</strong> {new Date(productDetails.orderDate).toLocaleString() || 'N/A'}</p>
+                            <p><strong>Tổng tiền:</strong> {productDetails.totalAmount ? `${Number(productDetails.totalAmount).toLocaleString()} VND` : 'N/A'}</p>
+                            <p><strong>Phương thức thanh toán:</strong> {productDetails.totalAmount || 'N/A'}</p>
+                            <p><strong>Trạng thái:</strong> {productDetails.orderStatus || 'N/A'}</p>
+                            <p><strong>Địa chỉ:</strong> {productDetails.shippingAddress?.addressUser || 'N/A'}</p>
+                        </div>
+                        <h4>Sản phẩm trong đơn hàng</h4>
+                        <div className="product-list">
+                            {productDetails.products.map((product, index) => (
+                                <div key={index} className="product-item">
+                                    <div className="product-image">
+
+                                        <img src={product.imageUrl} alt={product.name} />
                                     </div>
-                                )}
-                            </ul>
-                            <button onClick={closeDialog}>Đóng</button>
+                                    <div className="product-info">
+
+                                        <p><strong>Tên:</strong> {product.name}</p>
+                                        <p><strong>Số lượng:</strong> {product.quantity}</p>
+                                        <p><strong>Giá:</strong> {Number(product.price).toLocaleString()} VND</p>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                        <div>
+                            <button onClick={closeDialog} className="close-button">Đóng</button>
                         </div>
                     </div>
-                )
-            }
+                </div>
+            )}
         </div >
     );
 };

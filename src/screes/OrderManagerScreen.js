@@ -216,6 +216,10 @@ const OrderManagerScreen = () => {
             setConfirmDialogSX(true);
 
         }
+        else if (selectedAction === 'Chi tiết') {
+            openProductDetails(order);
+
+        }
     };
 
 
@@ -259,14 +263,7 @@ const OrderManagerScreen = () => {
                                 <td>{order.shippingAddress ? order.shippingAddress.nameAddresUser : 'N/A'}</td>
                                 <td>{order.totalAmount ? `${Number(order.totalAmount).toLocaleString()} VND` : 'N/A'}</td>
                                 <td>Chuyển khoản</td>
-                                <td>
-                                    <button
-                                        className="details"
-                                        onClick={() => openProductDetails(order)}
-                                    >
-                                        Chi tiết
-                                    </button>
-                                </td>
+                                <td>{order.orderStatus}</td>
                                 <td className=" ">
                                     <select
                                         value={order.orderStatus}
@@ -284,6 +281,9 @@ const OrderManagerScreen = () => {
                                         </option>
                                         <option value="Hủy đơn" disabled={order.orderStatus === 'Đã hủy'}>
                                             Hủy đơn
+                                        </option>
+                                        <option value="Chi tiết">
+                                            Chi tiết
                                         </option>
 
                                     </select>

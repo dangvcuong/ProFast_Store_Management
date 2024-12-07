@@ -262,7 +262,9 @@ const OrderManagerScreen = () => {
                                 <td>{order.orderDate ? new Date(order.orderDate).toLocaleString() : 'N/A'}</td>
                                 <td>{order.shippingAddress ? order.shippingAddress.nameAddresUser : 'N/A'}</td>
                                 <td>{order.totalAmount ? `${Number(order.totalAmount).toLocaleString()} VND` : 'N/A'}</td>
-                                <td>Chuyển khoản</td>
+                                <td>
+                                    {order.totalAmount > 0 ? 'Tiền mặt' : 'Ví Grofast'}
+                                </td>
                                 <td>{order.orderStatus}</td>
                                 <td className=" ">
                                     <select
@@ -363,7 +365,7 @@ const OrderManagerScreen = () => {
                 )
             }
 
-            
+
             {/* Product details dialog */}
             {productDetails && (
                 <div className="product-details-dialog">
@@ -375,7 +377,7 @@ const OrderManagerScreen = () => {
                             <p><strong>Số điện thoại:</strong> {productDetails.shippingAddress?.phoneAddresUser || 'N/A'}</p>
                             <p><strong>Ngày đặt:</strong> {new Date(productDetails.orderDate).toLocaleString() || 'N/A'}</p>
                             <p><strong>Tổng tiền:</strong> {productDetails.totalAmount ? `${Number(productDetails.totalAmount).toLocaleString()} VND` : 'N/A'}</p>
-                            <p><strong>Phương thức thanh toán:</strong> {productDetails.totalAmount || 'N/A'}</p>
+                            <p><strong>Phương thức thanh toán:</strong> {productDetails.totalAmount > 0 ? 'Tiền mặt' : 'Ví Grofast'}</p>
                             <p><strong>Trạng thái:</strong> {productDetails.orderStatus || 'N/A'}</p>
                             <p><strong>Địa chỉ:</strong> {productDetails.shippingAddress?.addressUser || 'N/A'}</p>
                         </div>

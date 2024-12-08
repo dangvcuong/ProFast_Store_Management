@@ -195,7 +195,7 @@ function Navbar({ onLogout, position }) {
                   borderBottom: '2px solid white',
                 },
                 marginBottom: 2,
-                padding: '10px 20px',
+                padding: '5px 10px',
               }}
             >
               <ListItemText primary={tab.label} />

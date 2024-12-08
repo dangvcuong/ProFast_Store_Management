@@ -52,7 +52,7 @@ const LoginScreen = ({ onLoginSuccess }) => {
         <View style={styles.container}>
             <View style={styles.box1}>
                 <Text style={styles.logoText}>GroFast</Text>
-                <Text style={styles.subtitle}>Good to see you again</Text>
+                <Text style={styles.subtitle}>Chào mừng quay chở lại</Text>
                 <TextInput
                     placeholder="Nhập tên đăng nhập"
                     value={username}
@@ -74,7 +74,7 @@ const LoginScreen = ({ onLoginSuccess }) => {
                 {errorMessage && <Text style={styles.errorText}>{errorMessage}</Text>}
                 <View style={{ height: 10 }}></View>
                 <TouchableOpacity onPress={handleSubmit} style={styles.button}>
-                    <Text style={styles.buttonText}>Sign in</Text>
+                    <Text style={styles.buttonText}>Đăng nhập</Text>
                 </TouchableOpacity>
             </View>
         </View>

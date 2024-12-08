@@ -51,7 +51,7 @@ tbody tr:hover {
     transition: background-color 0.3s;
 }
 
-*/ button {
+button {
     width: 100px;
     padding: 8px 12px;
     border: none;
@@ -180,25 +180,24 @@ table tbody tr {
     color: #999;
 }
 
-/* Container for the description */
+
 .product-description {
-    max-height: 100px; /* Default height for collapsed state */
+    max-height: 100px;
     overflow: hidden;
-    transition: max-height 0.3s ease-in-out; /* Smooth transition for expanding/collapsing */
+    transition: max-height 0.3s ease-in-out;
     text-overflow: ellipsis;
     display: -webkit-box;
-    -webkit-line-clamp: 3; /* Show only 3 lines of text */
+    -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
-  }
-  
-  /* When the description is expanded */
-  .product-description.expanded {
-    max-height: none; /* No max height when expanded */
-    -webkit-line-clamp: unset; /* Remove line clamping */
-  }
-  
-  /* Style for the 'Xem thêm' button */
-  .toggle-btn {
+}
+
+.product-description.expanded {
+    max-height: none;
+    -webkit-line-clamp: unset;
+}
+
+
+.toggle-btn {
     background-color: transparent;
     border: none;
     color: #007bff;
@@ -206,17 +205,16 @@ table tbody tr {
     cursor: pointer;
     text-decoration: underline;
     padding: 0;
-  }
-  
-  /* Hover effect for the button */
-  .toggle-btn:hover {
+}
+
+
+.toggle-btn:hover {
     color: #0056b3;
-  }
-  
-  /* Optional: Style for the description text */
-  .product-description {
+}
+
+
+.product-description {
     font-size: 14px;
     color: #333;
     line-height: 1.5;
-  }
-  
+}

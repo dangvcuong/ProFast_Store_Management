@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { db } from '../firebaseConfig';
-import { ref as dbRef, push, set, onValue } from 'firebase/database';
+import { ref as dbRef, push, set, onValue, update } from 'firebase/database';
 
 const ChatBoxScreen = () => {
     const [messages, setMessages] = useState([]);
@@ -45,6 +45,26 @@ const ChatBoxScreen = () => {
         }
     }, [userData]);
     // Lấy thông tin người dùng và lịch sử trò chuyện
+
+    // Hàm cập nhật trạng thái tin nhắn
+    const updateMessageStatus = (chatId) => {
+        const chatRef = dbRef(db, `chats/${chatId}/messages`);
+
+        onValue(chatRef, (snapshot) => {
+            const messages = snapshot.val();
+
+            if (messages) {
+                Object.keys(messages).forEach((key) => {
+                    const message = messages[key];
+                    if (message.status === 1) { // Kiểm tra trạng thái là "Chưa xem"
+                        // Cập nhật trạng thái thành "Đã xem"
+                        const messageRef = dbRef(db, `chats/${chatId}/messages/${key}`);
+                        update(messageRef, { status: 1, trangThai: "Đã xem" });
+                    }
+                });
+            }
+        }, { onlyOnce: true }); // Chỉ thực hiện một lần
+    };
     useEffect(() => {
         if (selectedMessage) {
             const userRef = dbRef(db, `users/${selectedMessage.id}`);
@@ -86,6 +106,7 @@ const ChatBoxScreen = () => {
                 authorId: userId,
                 imageUser: imageUser,
                 nameUser: nameUser,
+                trangThai: "Chưa xem",
                 createdAt: Date.now(),
                 text: replyText.trim(),
                 status: 2,
@@ -119,6 +140,7 @@ const ChatBoxScreen = () => {
                             onClick={() => {
                                 setSelectedMessage(message);
                                 setUserID(message.id);
+                                updateMessageStatus(message.id);
                             }}
                         >
                             <img

@@ -129,15 +129,15 @@ const OrderManagerScreen = () => {
                 }
             } else {
                 console.error('Danh sách sản phẩm không hợp lệ hoặc không tồn tại.');
-                alert('Không thể cập nhật số lượng bán vì danh sách sản phẩm bị lỗi.');
+
                 return;
             }
 
             // Kiểm tra kết quả cập nhật
             if (updateResults.every(result => result)) {
-                alert('Trạng thái đơn hàng đã được cập nhật thành "Thành công" và số lượng bán được đã được cập nhật.');
+                alert('Trạng thái đơn hàng đã được cập nhật thành "Thành công".');
             } else {
-                alert('Lỗi khi cập nhật số lượng bán được cho một số sản phẩm. Vui lòng kiểm tra lại.');
+                console.log('Lỗi khi cập nhật số lượng bán được cho một số sản phẩm. Vui lòng kiểm tra lại.');
             }
 
             // Làm mới danh sách đơn hàng
@@ -307,7 +307,7 @@ const OrderManagerScreen = () => {
             {
                 confirmDialog && (
                     <div className="confirmation-dialog">
-                        <div className="dialog-content">
+                        <div style={{ width: 500, height: 100, backgroundColor: "white", textAlign: 'center', borderRadius: 10, padding: 10 }}>
                             <h3>Xác nhận đơn hàng #{currentOrderId}?</h3>
 
                             <div className="dialog-footer">
@@ -327,7 +327,7 @@ const OrderManagerScreen = () => {
             {
                 confirmDialogSx && (
                     <div className="confirmation-dialog">
-                        <div className="dialog-content">
+                        <div style={{ width: 500, height: 100, backgroundColor: "white", textAlign: 'center', borderRadius: 10, padding: 20 }}>
                             <h3>Bạn có chắc chắn đơn hàng này #{currentOrderId} đã giao thành công?</h3>
 
                             <div className="dialog-footer">
@@ -348,7 +348,7 @@ const OrderManagerScreen = () => {
             {
                 cancelDialog && (
                     <div className="confirmation-dialog">
-                        <div className="dialog-content">
+                        <div style={{ width: 500, height: 100, backgroundColor: "white", textAlign: 'center', borderRadius: 10, padding: 20 }}>
                             <h3>Bạn có chắc chắn muốn hủy đơn hàng này #{currentOrderId}?</h3>
                             <div className="dialog-footer">
                                 <button onClick={() => { handleCancelStatus(currentOrderId); closeDialog(); }} style={{

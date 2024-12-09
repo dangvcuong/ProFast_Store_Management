@@ -24,6 +24,15 @@ const ProductManagement = () => {
     const [currentOrderId, setCurrentOrderId] = useState(null);
     const [confirmDialog, setConfirmDialog] = useState(false);
     const quantitysoldNew = 0;
+    const [position, setPosition] = useState('');
+    // Lấy position từ Firebase hoặc từ localStorage
+    useEffect(() => {
+        // Ví dụ lấy từ Firebase hoặc localStorage
+        const userPosition = localStorage.getItem('position');
+        setPosition(userPosition);
+    }, []);
+    console.log("Position: ", position);
+
     useEffect(() => {
         loadProductsRealtime();
         loadCompanies();
@@ -67,7 +76,10 @@ const ProductManagement = () => {
     };
 
     const handleAdd = async () => {
-
+        if (position !== 'admin') { // Chỉ admin được thêm
+            alert('Bạn không có quyền thêm sản phẩm.');
+            return;
+        }
         try {
             if (!image) {
                 alert('Vui lòng chọn ảnh');
@@ -107,6 +119,10 @@ const ProductManagement = () => {
     };
 
     const handleUpdate = async () => {
+        if (position !== 'admin') { // Chỉ admin được thêm
+            alert('Bạn không có quyền sửa sản phẩm.');
+            return;
+        }
         if (!id) {
             alert('Product ID not found for update');
             return;
@@ -151,6 +167,10 @@ const ProductManagement = () => {
     };
 
     const handleDelete = async (id_SanPham) => {
+        if (position !== 'admin') { // Chỉ admin được thêm
+            alert('Bạn không có quyền xóa sản phẩm.');
+            return;
+        }
         await deleteProduct(id_SanPham);
     };
 
@@ -196,7 +216,7 @@ const ProductManagement = () => {
     // Hàm kiểm tra nếu mô tả dài
     const isDescriptionLong = (description) => {
         // Định nghĩa chiều dài tối đa cho mô tả ngắn
-        const maxLength = 100; 
+        const maxLength = 100;
         return description.length > maxLength;
     };
 
@@ -206,7 +226,7 @@ const ProductManagement = () => {
             [id]: !prevState[id],
         }));
     };
-    
+
     return (
         <div className="body">
             <h1>Quản lý sản phẩm</h1>
@@ -439,7 +459,7 @@ const ProductManagement = () => {
             </table>
             {confirmDialog && (
                 <div className="confirmation-dialog">
-                    <div className="dialog-content">
+                    <div style={{ width: 500, height: 100, backgroundColor: "white", textAlign: 'center', borderRadius: 10, padding: 10 }}>
                         <h3>Xác nhận xóa sản phẩm này không?</h3>
 
                         <div className="dialog-footer">

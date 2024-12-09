@@ -8,11 +8,19 @@ const DatePickerComponent = ({ onDateChange }) => {
   const [endDate, setEndDate] = useState(new Date());
 
   const handleStartDateChange = (date) => {
+    // Nếu ngày bắt đầu sau ngày kết thúc, điều chỉnh lại ngày kết thúc
+    if (date > endDate) {
+      setEndDate(date); // Điều chỉnh ngày kết thúc bằng ngày bắt đầu
+    }
     setStartDate(date);
     onDateChange({ startDate: date, endDate }); // Callback gửi dữ liệu lên cha
   };
 
   const handleEndDateChange = (date) => {
+    // Nếu ngày kết thúc trước ngày bắt đầu, điều chỉnh lại ngày bắt đầu
+    if (date < startDate) {
+      setStartDate(date); // Điều chỉnh ngày bắt đầu bằng ngày kết thúc
+    }
     setEndDate(date);
     onDateChange({ startDate, endDate: date });
   };

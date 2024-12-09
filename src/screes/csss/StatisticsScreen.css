@@ -44,66 +44,47 @@ canvas {
   justify-content: space-between;
 }
 
-
 .tab {
   padding: 8px 16px;
   cursor: pointer;
   border: 1px solid #ccc;
   border-radius: 5px;
-
   flex-grow: 1;
   text-align: center;
   font-size: 14px;
+  background-color: #e0e0e0; /* Màu xám cho các tab chưa chọn */
+  color: #333; /* Màu chữ cho tab chưa chọn */
 }
 
+.tab.active {
+  background-color: #2196F3; /* Màu khi tab được chọn */
+  color: white;
+  font-weight: bold;
+  border: 0.5px solid #2196F3;
+}
+.total-revenue {
+  margin-top: 20px;
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #333;
+}
 
 .error-message {
   margin-top: 10px;
-
   background-color: #ffcccc;
-
   color: #ff0000;
-
   padding: 10px;
   border-radius: 5px;
-
   font-weight: bold;
   width: auto;
 }
-
 
 .filter-section {
   display: flex;
   align-items: center;
   gap: 10px;
-
   margin-bottom: 20px;
-
 }
-
-.apply-filter-button {
-  padding: 10px 20px;
-  background-color: #2196F3;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 14px;
-}
-
-.apply-filter-button:hover {
-  background-color: gray;
-}
-
-.tab.active {
-  background-color: #2196F3;
-  color: white;
-  font-weight: bold;
-  border: 0.5px solid #2196F3;
-}
-
-.tab:hover {
-  background-color: #f0f0f0;
-  transition: background-color 0.3s ease;
-  color: black;
+.total-revenue span {
+  margin-left: 320px;
 }

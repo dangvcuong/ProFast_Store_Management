@@ -9,6 +9,7 @@ import CompanyScreen from './screes/CompanyScreen';
 import ProductManagement from './screes/ProductScreen';
 import OrderManagerScreen from './screes/OrderManagerScreen';
 import StatisticsScreen from './screes/StatisticsScreen';
+import Reviews from './screes/ReviewScreen';
 import Vorcher from './screes/Vorcher';
 import { getDatabase, ref, update } from 'firebase/database'; // Import Firebase
 
@@ -16,6 +17,7 @@ import ChatBoxScreen from './screes/ChatBoxScreen';
 
 import { db } from './firebaseConfig';
 import { ref as dbRef, onValue } from 'firebase/database';
+
 
 function Navbar({ onLogout, position }) {
   const navigate = useNavigate();
@@ -142,6 +144,7 @@ function Navbar({ onLogout, position }) {
 
   const menuItems = [
     { label: 'Quản lý đơn hàng', path: '/order_management', roles: ['admin', 'nv'] },
+    { label: 'Quản lý đánh giá', path: '/review', roles: ['admin'] },
     { label: 'Quản lý sản phẩm', path: '/product_management', roles: ['admin', 'nv'] },
     { label: 'Quản lý danh mục', path: '/firm_management', roles: ['admin'] },
     { label: 'Quản lý mã ưu đãi', path: '/vorcher', roles: ['admin'] },
@@ -273,6 +276,7 @@ function App() {
               <Route path="/" element={<OrderManagerScreen />} />
               {isLoggedIn.position === 'admin' && (
                 <>
+                  <Route path="/review" element={<Reviews />} />
                   <Route path="/customer-management" element={<CustomerManagement />} />
                   <Route path="/personnel_management" element={<PersonnelManagement />} />
                   <Route path="/firm_management" element={<CompanyScreen />} />

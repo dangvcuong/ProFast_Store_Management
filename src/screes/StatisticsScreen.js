@@ -44,17 +44,19 @@ const StatisticsManagement = () => {
       dateRange.endDate,
       selectedTab === 'daily' ? 'daily' : 'monthly'
     );
-
+  
     if (selectedTab === 'revenue' && monthlyRevenue) {
       const months = Array.from({ length: 12 }, (_, i) => `Tháng ${i + 1}`);
+  
       const revenue = {
-        labels: months,
+        labels: months,  // Tháng vẫn được hiển thị
         datasets: [
           {
             label: 'Doanh thu (triệu VNĐ)',
             data: months.map((_, index) => {
               const monthKey = dayjs().month(index).format('MM-YYYY');
-              return monthlyRevenue[monthKey] ? (monthlyRevenue[monthKey] / 1_000_000).toFixed(2) : 0;
+              const value = monthlyRevenue[monthKey] || 0;
+              return value > 0 ? (value / 1_000_000).toFixed(2) : null; // Nếu doanh thu = 0 thì trả về null
             }),
             backgroundColor: 'rgba(75, 192, 192, 0.6)',
             borderColor: 'rgba(75, 192, 192, 1)',
@@ -62,16 +64,17 @@ const StatisticsManagement = () => {
           },
         ],
       };
+  
       setRevenueData(revenue);
     }
-
+  
     if (selectedTab === 'products' && productSales) {
       const topProducts = Object.entries(productSales)
         .sort((a, b) => b[1] - a[1])
         .slice(0, 5);
       const productNames = topProducts.map(([name]) => name);
       const productQuantities = topProducts.map(([_, quantity]) => quantity);
-
+  
       const products = {
         labels: productNames,
         datasets: [
@@ -86,12 +89,11 @@ const StatisticsManagement = () => {
       };
       setProductData(products);
     }
-
+  
     if (selectedTab === 'daily' && fetchedDailyStats) {
-      // Tính tổng doanh thu trong khoảng thời gian đã chọn
       const totalRevenue = Object.values(fetchedDailyStats).reduce((total, stats) => total + stats.totalRevenue, 0);
       setTotalRevenue(totalRevenue);
-
+  
       setDailyStats(
         Object.entries(fetchedDailyStats).map(([date, stats]) => ({
           date,
@@ -101,7 +103,7 @@ const StatisticsManagement = () => {
     }
     setIsLoading(false);
   };
-
+  
   useEffect(() => {
     fetchData();
   }, [dateRange, selectedTab]);

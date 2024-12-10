@@ -52,16 +52,20 @@ canvas {
   flex-grow: 1;
   text-align: center;
   font-size: 14px;
-  background-color: #e0e0e0; /* Màu xám cho các tab chưa chọn */
-  color: #333; /* Màu chữ cho tab chưa chọn */
+  background-color: #e0e0e0;
+  /* Màu xám cho các tab chưa chọn */
+  color: #333;
+  /* Màu chữ cho tab chưa chọn */
 }
 
 .tab.active {
-  background-color: #2196F3; /* Màu khi tab được chọn */
+  background-color: #2196F3;
+  /* Màu khi tab được chọn */
   color: white;
   font-weight: bold;
   border: 0.5px solid #2196F3;
 }
+
 .total-revenue {
   margin-top: 20px;
   font-size: 1.2rem;
@@ -85,6 +89,7 @@ canvas {
   gap: 10px;
   margin-bottom: 20px;
 }
+
 .total-revenue span {
   margin-left: 320px;
 }

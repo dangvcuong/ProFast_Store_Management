@@ -31,8 +31,8 @@ const StatisticsManagement = () => {
   const [dailyStats, setDailyStats] = useState([]);
   const [selectedTab, setSelectedTab] = useState('revenue');
   const [dateRange, setDateRange] = useState({
-    startDate: dayjs().subtract(7, 'day').toDate(),
-    endDate: new Date(),
+    startDate: dayjs().startOf('month').toDate(), // Ngày mùng 1 tháng hiện tại
+    endDate: new Date(), // Ngày hiện tại
   });
   const [isLoading, setIsLoading] = useState(false);
   const [totalRevenue, setTotalRevenue] = useState(0); // Dùng để lưu tổng doanh thu
@@ -44,10 +44,10 @@ const StatisticsManagement = () => {
       dateRange.endDate,
       selectedTab === 'daily' ? 'daily' : 'monthly'
     );
-  
+
     if (selectedTab === 'revenue' && monthlyRevenue) {
       const months = Array.from({ length: 12 }, (_, i) => `Tháng ${i + 1}`);
-  
+
       const revenue = {
         labels: months,  // Tháng vẫn được hiển thị
         datasets: [
@@ -64,17 +64,17 @@ const StatisticsManagement = () => {
           },
         ],
       };
-  
+
       setRevenueData(revenue);
     }
-  
+
     if (selectedTab === 'products' && productSales) {
       const topProducts = Object.entries(productSales)
         .sort((a, b) => b[1] - a[1])
         .slice(0, 5);
       const productNames = topProducts.map(([name]) => name);
       const productQuantities = topProducts.map(([_, quantity]) => quantity);
-  
+
       const products = {
         labels: productNames,
         datasets: [
@@ -89,11 +89,11 @@ const StatisticsManagement = () => {
       };
       setProductData(products);
     }
-  
+
     if (selectedTab === 'daily' && fetchedDailyStats) {
       const totalRevenue = Object.values(fetchedDailyStats).reduce((total, stats) => total + stats.totalRevenue, 0);
       setTotalRevenue(totalRevenue);
-  
+
       setDailyStats(
         Object.entries(fetchedDailyStats).map(([date, stats]) => ({
           date,
@@ -103,19 +103,19 @@ const StatisticsManagement = () => {
     }
     setIsLoading(false);
   };
-  
+
   useEffect(() => {
     fetchData();
   }, [dateRange, selectedTab]);
 
   const handleDateChange = (range) => {
     const { startDate, endDate } = range;
-  
+
     if (startDate > endDate) {
       alert("Ngày bắt đầu không được lớn hơn ngày kết thúc. Vui lòng chọn lại!");
       return;
     }
-  
+
     setDateRange(range);
   };
 
@@ -136,7 +136,7 @@ const StatisticsManagement = () => {
           Doanh thu theo ngày
         </button>
       </div>
-      <div className="chart-container" style={{ height: '500px', overflowY: 'auto' }}>
+      <div style={{ height: '370px' }}>
         {isLoading ? (
           <p>Đang tải dữ liệu...</p>
         ) : selectedTab === 'revenue' && revenueData ? (
@@ -144,8 +144,8 @@ const StatisticsManagement = () => {
         ) : selectedTab === 'products' && productData ? (
           <Bar data={productData} options={{ maintainAspectRatio: false }} height={500} />
         ) : selectedTab === 'daily' && dailyStats.length > 0 ? (
-          <div>
-            <table className="daily-stats-table">
+          <div >
+            <table>
               <thead>
                 <tr>
                   <th>Ngày</th>
@@ -153,7 +153,7 @@ const StatisticsManagement = () => {
                   <th>Tổng tiền (VNĐ)</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody style={{ overflowY: 'auto' }}>
                 {dailyStats.map((stat, index) => (
                   <tr key={index}>
                     <td>{dayjs(stat.date).format('DD-MM-YYYY')}</td>

@@ -211,7 +211,6 @@ function Navbar({ onLogout, position }) {
           sx={{
             color: 'white',
             justifyContent: 'center',
-            marginBottom: 2,
             border: '2px solid green',
             backgroundColor: 'green',
             '&:hover': {

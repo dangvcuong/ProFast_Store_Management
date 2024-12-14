@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, useNavigate } from 'react-router-dom';
-import { Box, Toolbar, Drawer, List, ListItem, ListItemText } from '@mui/material';
+import { Box, Toolbar, Drawer, List, ListItem, ListItemText, Modal, Typography, Button  } from '@mui/material';
 import logo from './images/grofast.png';
 import CustomerManagement from './screes/Customer_management';
 import PersonnelManagement from './screes/Personnel_management';
@@ -13,6 +13,8 @@ import Reviews from './screes/ReviewScreen';
 import Vorcher from './screes/Vorcher';
 import { getDatabase, ref, update } from 'firebase/database'; // Import Firebase
 import { FaBox, FaUsers, FaClipboardList, FaChartBar, FaComments, FaTags, FaUserTie, FaStore, FaSignOutAlt } from 'react-icons/fa';
+import Fade from '@mui/material/Fade'; // Đảm bảo đã import Fade
+import { Close as X, ExitToApp as LogOut } from '@mui/icons-material';
 
 
 import ChatBoxScreen from './screes/ChatBoxScreen';
@@ -23,8 +25,22 @@ import { ref as dbRef, onValue } from 'firebase/database';
 
 function Navbar({ onLogout, position }) {
   const navigate = useNavigate();
+  const [openModal, setOpenModal] = useState(false); // State kiểm soát Modal
   const [selectedTab, setSelectedTab] = React.useState('');
   const [isDrawerOpen, setIsDrawerOpen] = React.useState(true); // State kiểm soát Drawer
+
+  const handlclick = () => {
+    setOpenModal(true); // Mở Modal khi người dùng nhấn đăng xuất
+  };
+
+  const handleConfirmLogout = () => {
+    onLogout();
+    setOpenModal(false); // Đóng Modal khi người dùng xác nhận đăng xuất
+  };
+
+  const handleCancelLogout = () => {
+    setOpenModal(false); // Đóng Modal khi người dùng hủy
+  };
 
 
 
@@ -157,101 +173,176 @@ function Navbar({ onLogout, position }) {
     { label: 'Quản lý thống kê', path: '/statistics_management', icon: <FaChartBar />, roles: ['admin', 'nv'] },
     { label: 'Chat box', path: '/chat_box', icon: <FaComments />, roles: ['admin', 'nv'] },
   ];
-  
+
 
   const filteredMenuItems = menuItems.filter(item => item.roles.includes(position));
 
   return (
-    <Drawer
-    variant="permanent"
-    sx={{
-      width: 240,
-      flexShrink: 0,
-      [`& .MuiDrawer-paper`]: {
-        width: 240,
-        boxSizing: 'border-box',
-        backgroundColor: '#1976d2',
-        color: 'white',
-        paddingTop: 1, // Giảm padding trên của Drawer
-      },
-    }}
-  >
-  
-      <Toolbar>
-        <img
-          src={logo}
-          alt="logo"
-          style={{ width: 150, height: 150, marginRight: 16, cursor: 'pointer' }}
-          onClick={() => window.location.reload()}  // Thêm sự kiện reload khi nhấn vào logo
-        />
-      </Toolbar>
-
-      <Box sx={{ overflow: 'auto', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', height: '100%', padding: 1 }}>
-        <Box
-  sx={{
-    overflow: 'auto',
-    display: 'flex',
-    flexDirection: 'column',
-    justifyContent: 'flex-start', // Căn lên trên
-    height: '100%',
-    padding: 1,
-    gap: 1, // Thêm khoảng cách giữa các mục
-  }}
->
-  <List sx={{ padding: 0, margin: 0 }}> {/* Gỡ padding/margin thừa */}
-    {filteredMenuItems.map((tab, index) => (
-      <ListItem
-        button
-        key={index}
-        component={Link}
-        to={tab.path}
-        onClick={() => handleTabClick(tab.path)}
+    <>
+      <Drawer
+        variant="permanent"
         sx={{
-          color: selectedTab === tab.path ? 'yellow' : 'white',
-          justifyContent: 'flex-start',
-          '&:hover': {
-            backgroundColor: 'rgba(255, 255, 255, 0.2)',
+          width: 240,
+          flexShrink: 0,
+          [`& .MuiDrawer-paper`]: {
+            width: 240,
+            boxSizing: 'border-box',
+            backgroundColor: '#1976d2',
+            color: 'white',
+            paddingTop: 1, // Giảm padding trên của Drawer
           },
-          '&.Mui-selected': {
-            borderBottom: '2px solid white',
-          },
-          marginBottom: 0.5, // Giảm khoảng cách giữa các mục
-          padding: '10px 16px', // Tăng giảm padding theo ý muốn
         }}
       >
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-          {tab.icon} {/* Hiển thị icon */}
-          <ListItemText primary={tab.label} />
+        <Toolbar>
+          <img
+            src={logo}
+            alt="logo"
+            style={{ width: 150, height: 150, marginRight: 16, cursor: 'pointer' }}
+            onClick={() => window.location.reload()}  // Thêm sự kiện reload khi nhấn vào logo
+          />
+        </Toolbar>
+  
+        <Box sx={{ overflow: 'auto', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', height: '100%', padding: 1 }}>
+          <Box
+            sx={{
+              overflow: 'auto',
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'flex-start', // Căn lên trên
+              height: '100%',
+              padding: 1,
+              gap: 1, // Thêm khoảng cách giữa các mục
+            }}
+          >
+            <List sx={{ padding: 0, margin: 0 }}> {/* Gỡ padding/margin thừa */}
+              {filteredMenuItems.map((tab, index) => (
+                <ListItem
+                  button
+                  key={index}
+                  component={Link}
+                  to={tab.path}
+                  onClick={() => handleTabClick(tab.path)}
+                  sx={{
+                    color: selectedTab === tab.path ? 'yellow' : 'white',
+                    justifyContent: 'flex-start',
+                    '&:hover': {
+                      backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                    },
+                    '&.Mui-selected': {
+                      borderBottom: '2px solid white',
+                    },
+                    marginBottom: 0.5, // Giảm khoảng cách giữa các mục
+                    padding: '10px 16px', // Tăng giảm padding theo ý muốn
+                  }}
+                >
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                    {tab.icon} {/* Hiển thị icon */}
+                    <ListItemText primary={tab.label} />
+                  </Box>
+                </ListItem>
+              ))}
+            </List>
+          </Box>
+  
+          <ListItem
+            button
+            onClick={handlclick} // Mở Modal khi click nút Đăng xuất
+            sx={{
+              color: 'white',
+              justifyContent: 'center',
+              border: '2px solid green',
+              backgroundColor: 'green',
+              '&:hover': {
+                backgroundColor: '#b71c1c',
+              },
+              borderRadius: '8px',
+            }}
+          >
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+              <FaSignOutAlt />
+              <ListItemText primary="Đăng xuất" />
+            </Box>
+          </ListItem>
         </Box>
-      </ListItem>
-    ))}
-  </List>
-</Box>
-
-
-        <ListItem
-          button
-          onClick={handleLogoutClick}
+      </Drawer>
+  
+      {/* Modal xác nhận đăng xuất */}
+      <Modal
+      open={openModal}
+      onClose={handleCancelLogout}
+      closeAfterTransition
+      sx={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        backdropFilter: 'blur(5px)',
+      }}
+    >
+      <Fade in={openModal}>
+        <Box
           sx={{
-            color: 'white',
-            justifyContent: 'center',
-            border: '2px solid green',
-            backgroundColor: 'green',
-            '&:hover': {
-              backgroundColor: '#b71c1c',
-            },
-            borderRadius: '8px',
+            width: 400,
+            backgroundColor: 'background.paper',
+            borderRadius: 4,
+            boxShadow: 24,
+            p: 4,
+            textAlign: 'center',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 3,
+            border: '1px solid',
+            borderColor: 'divider',
           }}
         >
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-            <FaSignOutAlt /> {/* Icon cho đăng xuất */}
-            <ListItemText primary="Đăng xuất" />
-          </Box>
-        </ListItem>
+          <Typography variant="h5" sx={{ fontWeight: 'bold', color: 'text.primary' }}>
+            Bạn có chắc chắn muốn đăng xuất không?
+          </Typography>
 
-      </Box>
-    </Drawer>
+          <Typography variant="body1" sx={{ color: 'text.secondary' }}>
+            Bạn sẽ cần đăng nhập lại để truy cập tài khoản của mình.
+          </Typography>
+
+          <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2 }}>
+            <Button
+              variant="outlined"
+              onClick={handleCancelLogout}
+              startIcon={<X />}
+              sx={{
+                padding: '10px 20px',
+                borderColor: 'grey.300',
+                color: 'text.primary',
+                '&:hover': {
+                  backgroundColor: 'action.hover',
+                },
+              }}
+            >
+              Hủy
+            </Button>
+
+            <Button
+              variant="contained"
+              onClick={handleConfirmLogout}
+              startIcon={<LogOut />}
+              sx={{
+                padding: '10px 20px',
+                backgroundColor: 'error.main',
+                color: 'common.white',
+                '&:hover': {
+                  backgroundColor: 'error.dark',
+                },
+              }}
+            >
+              Đăng xuất
+            </Button>
+          </Box>
+        </Box>
+      </Fade>
+    </Modal>
+
+    </>
   );
+  
+  
 }
 
 function App() {

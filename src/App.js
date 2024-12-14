@@ -12,6 +12,8 @@ import StatisticsScreen from './screes/StatisticsScreen';
 import Reviews from './screes/ReviewScreen';
 import Vorcher from './screes/Vorcher';
 import { getDatabase, ref, update } from 'firebase/database'; // Import Firebase
+import { FaBox, FaUsers, FaClipboardList, FaChartBar, FaComments, FaTags, FaUserTie, FaStore, FaSignOutAlt } from 'react-icons/fa';
+
 
 import ChatBoxScreen from './screes/ChatBoxScreen';
 
@@ -22,6 +24,8 @@ import { ref as dbRef, onValue } from 'firebase/database';
 function Navbar({ onLogout, position }) {
   const navigate = useNavigate();
   const [selectedTab, setSelectedTab] = React.useState('');
+  const [isDrawerOpen, setIsDrawerOpen] = React.useState(true); // State kiểm soát Drawer
+
 
 
   //Thông báo tin nhắn
@@ -143,33 +147,36 @@ function Navbar({ onLogout, position }) {
   };
 
   const menuItems = [
-    { label: 'Quản lý đơn hàng', path: '/order_management', roles: ['admin', 'nv'] },
-    { label: 'Quản lý đánh giá', path: '/review', roles: ['admin'] },
-    { label: 'Quản lý sản phẩm', path: '/product_management', roles: ['admin', 'nv'] },
-    { label: 'Quản lý danh mục', path: '/firm_management', roles: ['admin'] },
-    { label: 'Quản lý mã ưu đãi', path: '/vorcher', roles: ['admin'] },
-    { label: 'Quản lý nhân viên', path: '/personnel_management', roles: ['admin'] },
-    { label: 'Quản lý khách hàng', path: '/customer-management', roles: ['admin'] },
-    { label: 'Quản lý thống kê', path: '/statistics_management', roles: ['admin', 'nv'] },
-    { label: 'Chat box', path: '/chat_box', roles: ['admin', 'nv'] },
+    { label: 'Quản lý đơn hàng', path: '/order_management', icon: <FaClipboardList />, roles: ['admin', 'nv'] },
+    { label: 'Quản lý đánh giá', path: '/review', icon: <FaComments />, roles: ['admin'] },
+    { label: 'Quản lý sản phẩm', path: '/product_management', icon: <FaBox />, roles: ['admin', 'nv'] },
+    { label: 'Quản lý danh mục', path: '/firm_management', icon: <FaStore />, roles: ['admin'] },
+    { label: 'Quản lý mã ưu đãi', path: '/vorcher', icon: <FaTags />, roles: ['admin'] },
+    { label: 'Quản lý nhân viên', path: '/personnel_management', icon: <FaUserTie />, roles: ['admin'] },
+    { label: 'Quản lý khách hàng', path: '/customer-management', icon: <FaUsers />, roles: ['admin'] },
+    { label: 'Quản lý thống kê', path: '/statistics_management', icon: <FaChartBar />, roles: ['admin', 'nv'] },
+    { label: 'Chat box', path: '/chat_box', icon: <FaComments />, roles: ['admin', 'nv'] },
   ];
+  
 
   const filteredMenuItems = menuItems.filter(item => item.roles.includes(position));
 
   return (
     <Drawer
-      variant="permanent"
-      sx={{
+    variant="permanent"
+    sx={{
+      width: 240,
+      flexShrink: 0,
+      [`& .MuiDrawer-paper`]: {
         width: 240,
-        flexShrink: 0,
-        [`& .MuiDrawer-paper`]: {
-          width: 240,
-          boxSizing: 'border-box',
-          backgroundColor: '#1976d2',
-          color: 'white',
-        },
-      }}
-    >
+        boxSizing: 'border-box',
+        backgroundColor: '#1976d2',
+        color: 'white',
+        paddingTop: 1, // Giảm padding trên của Drawer
+      },
+    }}
+  >
+  
       <Toolbar>
         <img
           src={logo}
@@ -180,31 +187,48 @@ function Navbar({ onLogout, position }) {
       </Toolbar>
 
       <Box sx={{ overflow: 'auto', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', height: '100%', padding: 1 }}>
-        <List>
-          {filteredMenuItems.map((tab, index) => (
-            <ListItem
-              button
-              key={index}
-              component={Link}
-              to={tab.path}
-              onClick={() => handleTabClick(tab.path)}
-              sx={{
-                color: selectedTab === tab.path ? 'yellow' : 'white',
-                justifyContent: 'center',
-                '&:hover': {
-                  backgroundColor: 'rgba(255, 255, 255, 0.2)',
-                },
-                '&.Mui-selected': {
-                  borderBottom: '2px solid white',
-                },
-                marginBottom: 2,
-                padding: '5px 10px',
-              }}
-            >
-              <ListItemText primary={tab.label} />
-            </ListItem>
-          ))}
-        </List>
+        <Box
+  sx={{
+    overflow: 'auto',
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'flex-start', // Căn lên trên
+    height: '100%',
+    padding: 1,
+    gap: 1, // Thêm khoảng cách giữa các mục
+  }}
+>
+  <List sx={{ padding: 0, margin: 0 }}> {/* Gỡ padding/margin thừa */}
+    {filteredMenuItems.map((tab, index) => (
+      <ListItem
+        button
+        key={index}
+        component={Link}
+        to={tab.path}
+        onClick={() => handleTabClick(tab.path)}
+        sx={{
+          color: selectedTab === tab.path ? 'yellow' : 'white',
+          justifyContent: 'flex-start',
+          '&:hover': {
+            backgroundColor: 'rgba(255, 255, 255, 0.2)',
+          },
+          '&.Mui-selected': {
+            borderBottom: '2px solid white',
+          },
+          marginBottom: 0.5, // Giảm khoảng cách giữa các mục
+          padding: '10px 16px', // Tăng giảm padding theo ý muốn
+        }}
+      >
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+          {tab.icon} {/* Hiển thị icon */}
+          <ListItemText primary={tab.label} />
+        </Box>
+      </ListItem>
+    ))}
+  </List>
+</Box>
+
+
         <ListItem
           button
           onClick={handleLogoutClick}
@@ -219,8 +243,12 @@ function Navbar({ onLogout, position }) {
             borderRadius: '8px',
           }}
         >
-          <ListItemText primary="Đăng xuất" />
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+            <FaSignOutAlt /> {/* Icon cho đăng xuất */}
+            <ListItemText primary="Đăng xuất" />
+          </Box>
         </ListItem>
+
       </Box>
     </Drawer>
   );

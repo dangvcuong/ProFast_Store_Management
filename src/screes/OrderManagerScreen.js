@@ -294,7 +294,7 @@ const OrderManagerScreen = () => {
                                         <option value="Thành công" disabled={order.orderStatus === 'Thành công' || order.orderStatus === 'Đã hủy'}>
                                             Thành công
                                         </option>
-                                        <option value="Hủy đơn" disabled={order.orderStatus === 'Đã hủy'}>
+                                        <option value="Hủy đơn" disabled={order.orderStatus === 'Thành công' || order.orderStatus === 'Đã hủy' || order.orderStatus === 'Đang giao hàng' || order.orderStatus === 'Đã xác nhận' }>
                                             Hủy đơn
                                         </option>
                                         <option value="Chi tiết">

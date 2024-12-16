@@ -41,6 +41,7 @@ canvas {
 .tab-navigation {
   margin-bottom: 20px;
   display: flex;
+  gap: 5px;
   justify-content: space-between;
 }
 

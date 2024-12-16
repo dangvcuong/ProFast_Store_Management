@@ -288,10 +288,10 @@ const OrderManagerScreen = () => {
                                         <option value="Xác nhận" disabled={order.orderStatus === 'Đã xác nhận' || order.orderStatus === 'Đang giao hàng' || order.orderStatus === 'Thành công' || order.orderStatus === 'Đã hủy'}>
                                             Xác nhận
                                         </option>
-                                        <option value="Đang giao" disabled={order.orderStatus === 'Đang giao hàng' || order.orderStatus === 'Thành công' || order.orderStatus === 'Đã hủy'}>
+                                        <option value="Đang giao" disabled={order.orderStatus === 'Đang chờ xác nhận' || order.orderStatus === 'Đang giao hàng' || order.orderStatus === 'Thành công' || order.orderStatus === 'Đã hủy'}>
                                             Đang giao
                                         </option>
-                                        <option value="Thành công" disabled={order.orderStatus === 'Thành công' || order.orderStatus === 'Đã hủy'}>
+                                        <option value="Thành công" disabled={order.orderStatus === 'Đang chờ xác nhận' || order.orderStatus === 'Đã xác nhận' || order.orderStatus === 'Thành công' || order.orderStatus === 'Đã hủy'}>
                                             Thành công
                                         </option>
                                         <option value="Hủy đơn" disabled={order.orderStatus === 'Thành công' || order.orderStatus === 'Đã hủy' || order.orderStatus === 'Đang giao hàng' || order.orderStatus === 'Đã xác nhận' }>

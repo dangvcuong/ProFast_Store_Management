@@ -36,8 +36,11 @@ export const updateOrderStatus = async (orderId, newStatus) => {
     }
 };
 
-// Hàm cập nhật trạng thái đơn hàng thành "Đang giao hàng"
+// Hàm cập nhật trạng thái đơn hàng thành "Đang đã xác nhận"
 export const confirmOrderStatus = async (orderId) => {
+    return updateOrderStatus(orderId, 'Đã xác nhận');
+};
+export const deliveryOrderStatus = async (orderId) => {
     return updateOrderStatus(orderId, 'Đang giao hàng');
 };
 

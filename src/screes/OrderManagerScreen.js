@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { fetchOrders, confirmOrderStatus, cancelOrderStatus, updateOrderStatus } from '../models/OrderModel';
+import { fetchOrders, confirmOrderStatus,deliveryOrderStatus, cancelOrderStatus, updateOrderStatus } from '../models/OrderModel';
 import '../screes/csss/OrderManagerScreen.css';
 import { db } from '../firebaseConfig';
 import { ref, get, update } from 'firebase/database';
@@ -8,6 +8,7 @@ const OrderManagerScreen = () => {
     const [filteredOrders, setFilteredOrders] = useState([]);
     const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]); // Lấy ngày hiện tại
     const [confirmDialog, setConfirmDialog] = useState(false);
+    const [confirmDialogdl, setConfirmDialogdl] = useState(false);
     const [confirmDialogSx, setConfirmDialogSX] = useState(false);
     const [cancelDialog, setCancelDialog] = useState(false);
     const [currentOrderId, setCurrentOrderId] = useState(null);
@@ -169,6 +170,10 @@ const OrderManagerScreen = () => {
         await confirmOrderStatus(orderId);
         updateOrdersList()
     };
+    const handledelivery = async (orderId) => {
+        await deliveryOrderStatus(orderId);
+        updateOrdersList()
+    };
 
     const handleCancelStatus = async (orderId) => {
         await cancelOrderStatus(orderId);
@@ -200,6 +205,7 @@ const OrderManagerScreen = () => {
         setCurrentOrderId(null);
         setProductDetails(null);
         setConfirmDialogSX(false);
+        setConfirmDialogdl(false);
     };
     const handleSelectAction = (event, order) => {
         const selectedAction = event.target.value;
@@ -208,7 +214,11 @@ const OrderManagerScreen = () => {
         if (selectedAction === 'Xác nhận') {
             setCurrentOrderId(order.orderId);
             setConfirmDialog(true);
-        } else if (selectedAction === 'Hủy đơn') {
+        }else if (selectedAction === 'Đang giao') {
+            setCurrentOrderId(order.orderId);
+            setConfirmDialogdl(true);
+        }
+         else if (selectedAction === 'Hủy đơn') {
             setCurrentOrderId(order.orderId);
             setCancelDialog(true);
         } else if (selectedAction === 'Thành công') {
@@ -275,8 +285,11 @@ const OrderManagerScreen = () => {
                                         <option value={order.orderStatus} disabled>
                                             {order.orderStatus}
                                         </option>
-                                        <option value="Xác nhận" disabled={order.orderStatus === 'Đang giao hàng' || order.orderStatus === 'Thành công' || order.orderStatus === 'Đã hủy'}>
+                                        <option value="Xác nhận" disabled={order.orderStatus === 'Đã xác nhận' || order.orderStatus === 'Đang giao hàng' || order.orderStatus === 'Thành công' || order.orderStatus === 'Đã hủy'}>
                                             Xác nhận
+                                        </option>
+                                        <option value="Đang giao" disabled={order.orderStatus === 'Đang giao hàng' || order.orderStatus === 'Thành công' || order.orderStatus === 'Đã hủy'}>
+                                            Đang giao
                                         </option>
                                         <option value="Thành công" disabled={order.orderStatus === 'Thành công' || order.orderStatus === 'Đã hủy'}>
                                             Thành công
@@ -312,6 +325,26 @@ const OrderManagerScreen = () => {
 
                             <div className="dialog-footer">
                                 <button onClick={() => { handleConfirmStatus(currentOrderId); closeDialog(); }} style={{
+                                    color: 'white',
+                                    backgroundColor: '#2196F3',
+                                }}>Đồng ý</button>
+                                <button onClick={closeDialog} style={{
+                                    color: 'white',
+                                    backgroundColor: '#2196F3',
+                                }}>Không</button>
+                            </div>
+                        </div>
+                    </div>
+                )
+            }
+            {
+                confirmDialogdl && (
+                    <div className="confirmation-dialog">
+                        <div style={{ width: 500, height: 100, backgroundColor: "white", textAlign: 'center', borderRadius: 10, padding: 10 }}>
+                            <h3>Xác nhận đơn hàng #{currentOrderId} đang giao hàng?</h3>
+
+                            <div className="dialog-footer">
+                                <button onClick={() => { handledelivery(currentOrderId); closeDialog(); }} style={{
                                     color: 'white',
                                     backgroundColor: '#2196F3',
                                 }}>Đồng ý</button>

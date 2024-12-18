@@ -227,7 +227,7 @@ const Vorcher = () => {
                         <th>Hành Động</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody style={{ height: '55vh' }}>
                     {vouchers.length === 0 ? (
                         <tr>
                             <td colSpan="8" style={{ textAlign: "center" }}>Không có dữ liệu</td>

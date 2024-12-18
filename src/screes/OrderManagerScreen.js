@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { fetchOrders, confirmOrderStatus,deliveryOrderStatus, cancelOrderStatus, updateOrderStatus } from '../models/OrderModel';
+import { fetchOrders, confirmOrderStatus, deliveryOrderStatus, cancelOrderStatus, updateOrderStatus } from '../models/OrderModel';
 import '../screes/csss/OrderManagerScreen.css';
 import { db } from '../firebaseConfig';
 import { ref, get, update } from 'firebase/database';
@@ -214,11 +214,11 @@ const OrderManagerScreen = () => {
         if (selectedAction === 'Xác nhận') {
             setCurrentOrderId(order.orderId);
             setConfirmDialog(true);
-        }else if (selectedAction === 'Đang giao') {
+        } else if (selectedAction === 'Đang giao') {
             setCurrentOrderId(order.orderId);
             setConfirmDialogdl(true);
         }
-         else if (selectedAction === 'Hủy đơn') {
+        else if (selectedAction === 'Hủy đơn') {
             setCurrentOrderId(order.orderId);
             setCancelDialog(true);
         } else if (selectedAction === 'Thành công') {
@@ -263,7 +263,7 @@ const OrderManagerScreen = () => {
                         <th>Thao tác</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody style={{ height: '70vh' }}>
                     {filteredOrders.length > 0 ? (
                         filteredOrders.map((order, index) => (
                             <tr key={order.orderId}>
@@ -294,7 +294,7 @@ const OrderManagerScreen = () => {
                                         <option value="Thành công" disabled={order.orderStatus === 'Đang chờ xác nhận' || order.orderStatus === 'Đã xác nhận' || order.orderStatus === 'Thành công' || order.orderStatus === 'Đã hủy'}>
                                             Thành công
                                         </option>
-                                        <option value="Hủy đơn" disabled={order.orderStatus === 'Thành công' || order.orderStatus === 'Đã hủy' || order.orderStatus === 'Đang giao hàng' || order.orderStatus === 'Đã xác nhận' }>
+                                        <option value="Hủy đơn" disabled={order.orderStatus === 'Thành công' || order.orderStatus === 'Đã hủy' || order.orderStatus === 'Đang giao hàng' || order.orderStatus === 'Đã xác nhận'}>
                                             Hủy đơn
                                         </option>
                                         <option value="Chi tiết">

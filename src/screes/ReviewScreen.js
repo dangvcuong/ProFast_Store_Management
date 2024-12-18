@@ -121,18 +121,18 @@ const Reviews = () => {
                         <th>Người dùng</th>
                         <th>Nội dung đánh giá</th>
                         <th>Đánh giá sao</th>
-                        <th>Trạng thái</th>
+                        {/* <th>Trạng thái</th> */}
                         <th>Hành động</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody style={{ height: '70vh' }}>
                     {reviews.map((review) => (
                         <tr key={review.id}>
                             <td>{review.productId}</td>
                             <td>{review.userName}</td>
                             <td>{review.review}</td>
                             <td>{renderStars(review.rating)}</td>
-                            <td>{review.status}</td>
+                            {/* <td>{review.status}</td> */}
                             <td>
                                 {review.status !== 'đã xác nhận' && (
                                     <button style={{ marginBottom: 10 }} onClick={() => handleConfirm(review.id, review.productId)}>Xác nhận</button>

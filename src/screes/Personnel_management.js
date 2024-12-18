@@ -214,7 +214,7 @@ const Personnel_management = () => {
                             <th>Thao tác</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody style={{ height: '55vh' }}>
                         {filterEdemployees.map((key) => (
                             <tr key={key}>
                                 <td>{employees[key].name}</td>

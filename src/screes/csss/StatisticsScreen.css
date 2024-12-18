@@ -68,7 +68,8 @@ canvas {
 }
 
 .total-revenue {
-  margin-top: 20px;
+  
+  margin-bottom: 20px;
   font-size: 1.2rem;
   font-weight: bold;
   color: #333;
@@ -88,9 +89,8 @@ canvas {
   display: flex;
   align-items: center;
   gap: 10px;
-  margin-bottom: 20px;
 }
 
 .total-revenue span {
-  margin-left: 320px;
+  margin-left: 10px;
 }

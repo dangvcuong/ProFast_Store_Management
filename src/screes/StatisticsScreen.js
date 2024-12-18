@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Bar } from 'react-chartjs-2';
-import fetchStatisticsData from '../models/Statistics_Model'; // Sử dụng API đã sửa đổi
+import fetchStatisticsData from '../models/Statistics_Model';
 import DatePickerComponent from '../models/DatePickerComponent';
 import '../screes/csss/StatisticsScreen.css';
 import dayjs from 'dayjs';
@@ -29,34 +29,47 @@ const StatisticsManagement = () => {
   const [revenueData, setRevenueData] = useState(null);
   const [productData, setProductData] = useState(null);
   const [dailyStats, setDailyStats] = useState([]);
-  const [selectedTab, setSelectedTab] = useState('revenue');
+  const [totalOrders, setTotalOrders] = useState(0);
+  const [selectedTab, setSelectedTab] = useState('daily');
   const [dateRange, setDateRange] = useState({
-    startDate: dayjs().startOf('month').toDate(), // Ngày mùng 1 tháng hiện tại
-    endDate: new Date(), // Ngày hiện tại
+    startDate: dayjs().startOf('month').toDate(),
+    endDate: new Date(),
   });
   const [isLoading, setIsLoading] = useState(false);
-  const [totalRevenue, setTotalRevenue] = useState(0); // Dùng để lưu tổng doanh thu
+  const [totalRevenue, setTotalRevenue] = useState(0);
+  const [pendingOrders, setPendingOrders] = useState(0);
+  const [confirmedOrders, setConfirmedOrders] = useState(0);
+  const [shippingOrders, setShippingOrders] = useState(0);
+  const [completedOrders, setCompletedOrders] = useState(0);
+  const [cancelledOrders, setCancelledOrders] = useState(0);
 
   const fetchData = async () => {
     setIsLoading(true);
-    const { monthlyRevenue, productSales, dailyStats: fetchedDailyStats } = await fetchStatisticsData(
+    const { monthlyRevenue, productSales, dailyStats: fetchedDailyStats, orderStatusCounts } = await fetchStatisticsData(
       dateRange.startDate,
       dateRange.endDate,
       selectedTab === 'daily' ? 'daily' : 'monthly'
     );
 
+    if (orderStatusCounts) {
+      setPendingOrders(orderStatusCounts.pending || 0);
+      setConfirmedOrders(orderStatusCounts.confirmed || 0);
+      setShippingOrders(orderStatusCounts.shipping || 0);
+      setCompletedOrders(orderStatusCounts.completed || 0);
+      setCancelledOrders(orderStatusCounts.cancelled || 0);
+    }
+
     if (selectedTab === 'revenue' && monthlyRevenue) {
       const months = Array.from({ length: 12 }, (_, i) => `Tháng ${i + 1}`);
-
       const revenue = {
-        labels: months,  // Tháng vẫn được hiển thị
+        labels: months,
         datasets: [
           {
             label: 'Doanh thu (triệu VNĐ)',
             data: months.map((_, index) => {
               const monthKey = dayjs().month(index).format('MM-YYYY');
               const value = monthlyRevenue[monthKey] || 0;
-              return value > 0 ? (value / 1_000_000).toFixed(2) : null; // Nếu doanh thu = 0 thì trả về null
+              return value > 0 ? (value / 1_000_000).toFixed(2) : null;
             }),
             backgroundColor: 'rgba(75, 192, 192, 0.6)',
             borderColor: 'rgba(75, 192, 192, 1)',
@@ -64,16 +77,13 @@ const StatisticsManagement = () => {
           },
         ],
       };
-
       setRevenueData(revenue);
     }
 
     if (selectedTab === 'products' && productSales) {
-      const topProducts = Object.entries(productSales)
-        .sort((a, b) => b[1] - a[1])
-        .slice(0, 5);
-      const productNames = topProducts.map(([name]) => name);
-      const productQuantities = topProducts.map(([_, quantity]) => quantity);
+      const allProducts = Object.entries(productSales);
+      const productNames = allProducts.map(([name]) => name);
+      const productQuantities = allProducts.map(([_, quantity]) => quantity);
 
       const products = {
         labels: productNames,
@@ -92,7 +102,12 @@ const StatisticsManagement = () => {
 
     if (selectedTab === 'daily' && fetchedDailyStats) {
       const totalRevenue = Object.values(fetchedDailyStats).reduce((total, stats) => total + stats.totalRevenue, 0);
+      const totalOrdersCount = Object.values(fetchedDailyStats).reduce((total, stats) => total + stats.totalOrders, 0);
+      const successfulOrdersCount = Object.values(fetchedDailyStats).reduce((total, stats) => total + stats.successfulOrders, 0);
+
       setTotalRevenue(totalRevenue);
+      setTotalOrders(totalOrdersCount);
+      setCompletedOrders(successfulOrdersCount); // Cập nhật số đơn hàng thành công
 
       setDailyStats(
         Object.entries(fetchedDailyStats).map(([date, stats]) => ({
@@ -106,9 +121,9 @@ const StatisticsManagement = () => {
 
   useEffect(() => {
     fetchData();
-  }, [dateRange, selectedTab]);
+  }, [dateRange, selectedTab]); // Gọi fetchData khi dateRange hoặc selectedTab thay đổi
 
-  const handleDateChange = (range) => {
+  const handleDateChange = async (range) => {
     const { startDate, endDate } = range;
 
     if (startDate > endDate) {
@@ -117,6 +132,38 @@ const StatisticsManagement = () => {
     }
 
     setDateRange(range);
+
+    // Gọi lại hàm fetchData sau khi chọn ngày
+    const { monthlyRevenue, productSales, dailyStats: fetchedDailyStats, orderStatusCounts } = await fetchStatisticsData(
+      startDate,
+      endDate,
+      'daily' // Chọn 'daily' để tính toán ngay
+    );
+
+    if (orderStatusCounts) {
+      setPendingOrders(orderStatusCounts.pending || 0);
+      setConfirmedOrders(orderStatusCounts.confirmed || 0);
+      setShippingOrders(orderStatusCounts.shipping || 0);
+      setCompletedOrders(orderStatusCounts.completed || 0);
+      setCancelledOrders(orderStatusCounts.cancelled || 0);
+    }
+
+    if (fetchedDailyStats) {
+      const totalRevenue = Object.values(fetchedDailyStats).reduce((total, stats) => total + stats.totalRevenue, 0);
+      const totalOrdersCount = Object.values(fetchedDailyStats).reduce((total, stats) => total + stats.totalOrders, 0);
+      const successfulOrdersCount = Object.values(fetchedDailyStats).reduce((total, stats) => total + stats.successfulOrders, 0);
+
+      setTotalRevenue(totalRevenue);
+      setTotalOrders(totalOrdersCount);
+      setCompletedOrders(successfulOrdersCount); // Cập nhật số đơn hàng thành công
+
+      setDailyStats(
+        Object.entries(fetchedDailyStats).map(([date, stats]) => ({
+          date,
+          ...stats,
+        }))
+      );
+    }
   };
 
   return (
@@ -125,15 +172,34 @@ const StatisticsManagement = () => {
       <div className="filter-section">
         <DatePickerComponent onDateChange={handleDateChange} />
       </div>
+      <div className="info">
+        <strong>
+          Tổng số đơn hàng từ ngày {dayjs(dateRange.startDate).format('DD-MM-YYYY')} đến {dayjs(dateRange.endDate).format('DD-MM-YYYY')}:
+        </strong>
+        <span>{totalOrders}</span>
+      </div>
+      <div className="order-status-boxes">
+        <div className="box completed">
+          <img src="https://png.pngtree.com/png-clipart/20230418/original/pngtree-order-confirm-line-icon-png-image_9065104.png" alt="Đơn hàng thành công" className="icon completed-icon" />
+          <span className="box-title">Đơn hàng thành công</span>
+          <strong>{completedOrders}</strong>
+        </div>
+        
+        <div className="box cancelled">
+          <img src="https://png.pngtree.com/png-clipart/20230417/original/pngtree-revenue-line-icon-png-image_9063740.png" alt="Doanh thu" className="icon cancelled-icon" />
+          <span className="box-title">Tổng doanh thu</span>
+          <strong>{totalRevenue.toLocaleString()} VNĐ</strong>
+        </div>
+      </div>
       <div className="tab-navigation">
-        <button className={`tab ${selectedTab === 'revenue' ? 'active' : ''}`} onClick={() => setSelectedTab('revenue')}>
-          Doanh thu
-        </button>
-        <button className={`tab ${selectedTab === 'products' ? 'active' : ''}`} onClick={() => setSelectedTab('products')}>
-          Sản phẩm bán chạy
-        </button>
         <button className={`tab ${selectedTab === 'daily' ? 'active' : ''}`} onClick={() => setSelectedTab('daily')}>
           Doanh thu theo ngày
+        </button>
+        <button className={`tab ${selectedTab === 'revenue' ? 'active' : ''}`} onClick={() => setSelectedTab('revenue')}>
+          Doanh thu theo tháng
+        </button>
+        <button className={`tab ${selectedTab === 'products' ? 'active' : ''}`} onClick={() => setSelectedTab('products')}>
+          Sản phẩm
         </button>
       </div>
       <div style={{ height: '370px' }}>
@@ -142,34 +208,48 @@ const StatisticsManagement = () => {
         ) : selectedTab === 'revenue' && revenueData ? (
           <Bar data={revenueData} options={{ maintainAspectRatio: false }} height={500} />
         ) : selectedTab === 'products' && productData ? (
-          <Bar data={productData} options={{ maintainAspectRatio: false }} height={500} />
+          <div>
+            <table>
+              <thead>
+                <tr>
+                  <th>Tên sản phẩm</th>
+                  <th>Số lượng đã bán</th>
+                </tr>
+              </thead>
+              <tbody>
+                {Object.entries(productData.datasets[0].data).map(([index, quantity]) => (
+                  <tr key={index}>
+                    <td>{productData.labels[index]}</td>
+                    <td>{quantity}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         ) : selectedTab === 'daily' && dailyStats.length > 0 ? (
-          <div >
+          <div>
             <table>
               <thead>
                 <tr>
                   <th>Ngày</th>
                   <th>Tổng đơn hàng</th>
+                  <th>Đơn thành công</th>
+                  <th>Đơn hủy</th>
                   <th>Tổng tiền (VNĐ)</th>
                 </tr>
               </thead>
-              <tbody style={{ overflowY: 'auto' }}>
+              <tbody>
                 {dailyStats.map((stat, index) => (
                   <tr key={index}>
                     <td>{dayjs(stat.date).format('DD-MM-YYYY')}</td>
                     <td>{stat.totalOrders}</td>
+                    <td>{stat.successfulOrders}</td> {/* Hiển thị số đơn hàng thành công */}
+                    <td>{stat.cancelledOrders}</td> {/* Hiển thị số đơn hàng đã hủy */}
                     <td>{stat.totalRevenue.toLocaleString()}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
-            {/* Thêm thông tin tổng doanh thu dưới bảng */}
-            <div className="total-revenue">
-              <strong>
-                Tổng doanh thu từ ngày {dayjs(dateRange.startDate).format('DD-MM-YYYY')} đến {dayjs(dateRange.endDate).format('DD-MM-YYYY')}:
-              </strong>
-              <span>{totalRevenue.toLocaleString()} VNĐ</span>
-            </div>
           </div>
         ) : (
           <p>Không có dữ liệu thống kê.</p>

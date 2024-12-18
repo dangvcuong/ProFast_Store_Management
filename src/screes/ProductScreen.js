@@ -25,6 +25,25 @@ const ProductManagement = () => {
     const [confirmDialog, setConfirmDialog] = useState(false);
     const quantitysoldNew = 0;
     const [position, setPosition] = useState('');
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [selectedProduct, setSelectedProduct] = useState(null);
+    const [isExpanded, setIsExpanded] = useState(false);
+
+    const toggleExpand = () => {
+        setIsExpanded((prev) => !prev);
+    };
+
+    // Hàm mở modal và set dữ liệu sản phẩm
+    const handleViewDetails = (product) => {
+        setSelectedProduct(product);
+        setIsModalOpen(true);
+    };
+
+    // Hàm đóng modal
+    const handleCloseModal = () => {
+        setIsModalOpen(false);
+        setSelectedProduct(null);
+    };
     // Lấy position từ Firebase hoặc từ localStorage
     useEffect(() => {
         // Ví dụ lấy từ Firebase hoặc localStorage
@@ -427,7 +446,7 @@ const ProductManagement = () => {
                                     onError={(e) => e.target.src = "https://via.placeholder.com/50"}
                                 />
                             </td>
-                            <td>{products[key].name}</td>
+                            <td onClick={() => handleViewDetails(products[key])}>{products[key].name}</td>
                             <td>{products[key].price}</td>
                             <td>{products[key].quantity}</td>
                             <td>
@@ -457,6 +476,86 @@ const ProductManagement = () => {
                     ))}
                 </tbody>
             </table>
+            {/* Modal hiển thị chi tiết sản phẩm */}
+            {isModalOpen && selectedProduct && (
+                <div className="confirmation-dialog" style={{
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    position: "fixed",
+                    top: 0,
+                    left: 0,
+                    width: "100%",
+                    height: "100%",
+                    backgroundColor: "rgba(0,0,0,0.5)",
+                }}>
+                    <div style={{
+                        width: 500,
+                        maxHeight: 500,
+                        backgroundColor: "white",
+                        borderRadius: 10,
+                        padding: 10,
+                        display: "flex",
+                        flexDirection: "column",
+                    }}>
+                        {/* Nội dung có thể cuộn */}
+                        <div style={{
+                            flex: 1, // Phần nội dung sẽ chiếm toàn bộ không gian còn lại
+                            overflowY: "auto", // Cho phép cuộn nếu nội dung quá dài
+                        }}>
+                            <h2 style={{ textAlign: 'center' }}>Chi tiết sản phẩm</h2>
+                            <img
+                                src={selectedProduct.imageUrl}
+                                alt={selectedProduct.name}
+                                style={{ width: 100, height: 100, marginBottom: "10px", }}
+                            />
+                            <p><strong>Tên sản phẩm:</strong> {selectedProduct.name}</p>
+                            <p><strong>Giá:</strong> {selectedProduct.price} VNĐ</p>
+                            <p><strong>Số lượng:</strong> {selectedProduct.quantity}</p>
+                            <p><strong>Đã bán:</strong> {selectedProduct.quantitysold}</p>
+                            <p><strong>Đánh giá:</strong> {selectedProduct.evaluate}</p>
+
+                            {/* Mô tả */}
+                            <p>
+                                <strong>Mô tả:</strong>{" "}
+                                {isExpanded
+                                    ? selectedProduct.describe
+                                    : `${selectedProduct.describe.slice(0, 100)}...`}
+                                <button
+                                    onClick={toggleExpand}
+                                    className="toggle-btn"
+                                >
+                                    {isExpanded ? "Thu gọn" : "Xem thêm"}
+                                </button>
+                            </p>
+                        </div>
+
+                        {/* Nút Đóng luôn ở dưới */}
+                        <div style={{
+                            textAlign: "center",
+                            paddingTop: "10px",
+
+                        }}>
+                            <button
+                                onClick={handleCloseModal}
+                                style={{
+                                    padding: "8px 16px",
+                                    backgroundColor: "#007BFF",
+                                    color: "white",
+                                    border: "none",
+                                    borderRadius: "5px",
+                                    cursor: "pointer",
+
+                                }}
+                            >
+                                Đóng
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+
             {confirmDialog && (
                 <div className="confirmation-dialog">
                     <div style={{ width: 500, height: 100, backgroundColor: "white", textAlign: 'center', borderRadius: 10, padding: 10 }}>

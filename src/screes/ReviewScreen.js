@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { db } from '../firebaseConfig';
 import { get, ref, update, remove } from 'firebase/database';
 
-// Hàm để hiển thị đánh giá sao
+// Hàm render đánh giá sao
 const renderStars = (rating) => {
     const stars = [];
     for (let i = 1; i <= 5; i++) {
@@ -15,11 +15,39 @@ const renderStars = (rating) => {
     return stars;
 };
 
+// Modal xem chi tiết
+const ReviewDetailModal = ({ review, onClose }) => {
+    if (!review) return null;
+
+    return (
+        <div style={{
+            position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.5)', display: 'flex',
+            justifyContent: 'center', alignItems: 'center',
+        }}>
+            <div style={{
+                backgroundColor: 'white', padding: '20px', borderRadius: '8px',
+                width: '500px', boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)'
+            }}>
+                <h2>Chi tiết đánh giá</h2>
+                <p><strong>Tên sản phẩm:</strong> {review.nameProduct}</p>
+                <p><strong>Người dùng:</strong> {review.userName}</p>
+                <p><strong>Nội dung:</strong> {review.review}</p>
+                <p><strong>Đánh giá sao:</strong> {renderStars(review.rating)}</p>
+                <div style={{ textAlign: 'right' }}>
+                    <button onClick={onClose} style={{ marginTop: '10px' }}>Đóng</button>
+                </div>
+            </div>
+        </div>
+    );
+};
+
 const Reviews = () => {
     const [reviews, setReviews] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [productIds, setProductIds] = useState([]);
+    const [selectedReview, setSelectedReview] = useState(null); // State modal chi tiết
 
     const fetchProductIds = async () => {
         try {
@@ -73,8 +101,6 @@ const Reviews = () => {
                     );
                     return [...prevReviews, ...newReviews];
                 });
-            } else {
-                console.log('Không có đánh giá nào cho sản phẩm', productId);
             }
         } catch (err) {
             setError('Không thể tải đánh giá. Vui lòng thử lại.');
@@ -103,13 +129,8 @@ const Reviews = () => {
         }
     };
 
-    if (loading) {
-        return <p>Đang tải đánh giá...</p>;
-    }
-
-    if (error) {
-        return <p>{error}</p>;
-    }
+    if (loading) return <p>Đang tải đánh giá...</p>;
+    if (error) return <p>{error}</p>;
 
     return (
         <div>
@@ -117,32 +138,35 @@ const Reviews = () => {
             <table>
                 <thead>
                     <tr>
-                        <th>Mã sản phẩm</th>
+                        <th>Tên sản phẩm</th>
                         <th>Người dùng</th>
-                        <th>Nội dung đánh giá</th>
+                        <th>Nội dung</th>
                         <th>Đánh giá sao</th>
-                        {/* <th>Trạng thái</th> */}
                         <th>Hành động</th>
                     </tr>
                 </thead>
-                <tbody style={{ height: '70vh' }}>
+                <tbody>
                     {reviews.map((review) => (
                         <tr key={review.id}>
-                            <td>{review.productId}</td>
+                            <td onClick={() => setSelectedReview(review)}>{review.nameProduct}</td>
                             <td>{review.userName}</td>
                             <td>{review.review}</td>
                             <td>{renderStars(review.rating)}</td>
-                            {/* <td>{review.status}</td> */}
                             <td>
-                                {review.status !== 'đã xác nhận' && (
-                                    <button style={{ marginBottom: 10 }} onClick={() => handleConfirm(review.id, review.productId)}>Xác nhận</button>
-                                )}
                                 <button onClick={() => handleDelete(review.id, review.productId)}>Xóa</button>
                             </td>
                         </tr>
                     ))}
                 </tbody>
             </table>
+
+            {/* Hiển thị modal khi selectedReview có giá trị */}
+            {selectedReview && (
+                <ReviewDetailModal
+                    review={selectedReview}
+                    onClose={() => setSelectedReview(null)}
+                />
+            )}
         </div>
     );
 };

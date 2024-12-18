@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, useNavigate } from 'react-router-dom';
-import { Box, Toolbar, Drawer, List, ListItem, ListItemText, Modal, Typography, Button  } from '@mui/material';
+import { Box, Toolbar, Drawer, List, ListItem, ListItemText, Modal, Typography, Button } from '@mui/material';
 import logo from './images/grofast.png';
 import CustomerManagement from './screes/Customer_management';
 import PersonnelManagement from './screes/Personnel_management';
@@ -171,7 +171,7 @@ function Navbar({ onLogout, position }) {
     { label: 'Quản lý nhân viên', path: '/personnel_management', icon: <FaUserTie />, roles: ['admin'] },
     { label: 'Quản lý khách hàng', path: '/customer-management', icon: <FaUsers />, roles: ['admin'] },
     { label: 'Quản lý thống kê', path: '/statistics_management', icon: <FaChartBar />, roles: ['admin', 'nv'] },
-    { label: 'Chat box', path: '/chat_box', icon: <FaComments />, roles: ['admin', 'nv'] },
+    { label: 'Hỗ trợ khách hàng', path: '/chat_box', icon: <FaComments />, roles: ['admin', 'nv'] },
   ];
 
 
@@ -201,7 +201,7 @@ function Navbar({ onLogout, position }) {
             onClick={() => window.location.reload()}  // Thêm sự kiện reload khi nhấn vào logo
           />
         </Toolbar>
-  
+
         <Box sx={{ overflow: 'auto', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', height: '100%', padding: 1 }}>
           <Box
             sx={{
@@ -243,7 +243,7 @@ function Navbar({ onLogout, position }) {
               ))}
             </List>
           </Box>
-  
+
           <ListItem
             button
             onClick={handlclick} // Mở Modal khi click nút Đăng xuất
@@ -265,84 +265,84 @@ function Navbar({ onLogout, position }) {
           </ListItem>
         </Box>
       </Drawer>
-  
+
       {/* Modal xác nhận đăng xuất */}
       <Modal
-      open={openModal}
-      onClose={handleCancelLogout}
-      closeAfterTransition
-      sx={{
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        backdropFilter: 'blur(5px)',
-      }}
-    >
-      <Fade in={openModal}>
-        <Box
-          sx={{
-            width: 400,
-            backgroundColor: 'background.paper',
-            borderRadius: 4,
-            boxShadow: 24,
-            p: 4,
-            textAlign: 'center',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 3,
-            border: '1px solid',
-            borderColor: 'divider',
-          }}
-        >
-          <Typography variant="h5" sx={{ fontWeight: 'bold', color: 'text.primary' }}>
-            Bạn có chắc chắn muốn đăng xuất không?
-          </Typography>
+        open={openModal}
+        onClose={handleCancelLogout}
+        closeAfterTransition
+        sx={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          backdropFilter: 'blur(5px)',
+        }}
+      >
+        <Fade in={openModal}>
+          <Box
+            sx={{
+              width: 400,
+              backgroundColor: 'background.paper',
+              borderRadius: 4,
+              boxShadow: 24,
+              p: 4,
+              textAlign: 'center',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 3,
+              border: '1px solid',
+              borderColor: 'divider',
+            }}
+          >
+            <Typography variant="h5" sx={{ fontWeight: 'bold', color: 'text.primary' }}>
+              Bạn có chắc chắn muốn đăng xuất không?
+            </Typography>
 
-          <Typography variant="body1" sx={{ color: 'text.secondary' }}>
-            Bạn sẽ cần đăng nhập lại để truy cập tài khoản của mình.
-          </Typography>
+            <Typography variant="body1" sx={{ color: 'text.secondary' }}>
+              Bạn sẽ cần đăng nhập lại để truy cập tài khoản của mình.
+            </Typography>
 
-          <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2 }}>
-            <Button
-              variant="outlined"
-              onClick={handleCancelLogout}
-              startIcon={<X />}
-              sx={{
-                padding: '10px 20px',
-                borderColor: 'grey.300',
-                color: 'text.primary',
-                '&:hover': {
-                  backgroundColor: 'action.hover',
-                },
-              }}
-            >
-              Hủy
-            </Button>
+            <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2 }}>
+              <Button
+                variant="outlined"
+                onClick={handleCancelLogout}
+                startIcon={<X />}
+                sx={{
+                  padding: '10px 20px',
+                  borderColor: 'grey.300',
+                  color: 'text.primary',
+                  '&:hover': {
+                    backgroundColor: 'action.hover',
+                  },
+                }}
+              >
+                Hủy
+              </Button>
 
-            <Button
-              variant="contained"
-              onClick={handleConfirmLogout}
-              startIcon={<LogOut />}
-              sx={{
-                padding: '10px 20px',
-                backgroundColor: 'error.main',
-                color: 'common.white',
-                '&:hover': {
-                  backgroundColor: 'error.dark',
-                },
-              }}
-            >
-              Đăng xuất
-            </Button>
+              <Button
+                variant="contained"
+                onClick={handleConfirmLogout}
+                startIcon={<LogOut />}
+                sx={{
+                  padding: '10px 20px',
+                  backgroundColor: 'error.main',
+                  color: 'common.white',
+                  '&:hover': {
+                    backgroundColor: 'error.dark',
+                  },
+                }}
+              >
+                Đăng xuất
+              </Button>
+            </Box>
           </Box>
-        </Box>
-      </Fade>
-    </Modal>
+        </Fade>
+      </Modal>
 
     </>
   );
-  
-  
+
+
 }
 
 function App() {

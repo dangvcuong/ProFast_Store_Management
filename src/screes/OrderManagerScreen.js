@@ -27,14 +27,12 @@ const OrderManagerScreen = () => {
                 orderId: key,
             }));
 
-            // Sắp xếp đơn hàng theo thời gian tạo (mới nhất lên đầu)
+            // Sắp xếp theo orderDate giảm dần (mới nhất lên đầu)
             const sortedOrders = ordersArray.sort((a, b) => {
-                // Đảm bảo "createdAt" là ngày hợp lệ, nếu không sẽ sắp xếp theo giá trị mặc định
-                const dateA = new Date(a.createdAt);
-                const dateB = new Date(b.createdAt);
+                const dateA = new Date(a.orderDate).getTime(); // Chuyển orderDate thành timestamp
+                const dateB = new Date(b.orderDate).getTime();
 
-                // So sánh thời gian chính xác (mới nhất lên đầu)
-                return dateB - dateA;  // Nếu muốn mới nhất lên đầu
+                return dateB - dateA; // Sắp xếp giảm dần
             });
 
             // Lưu danh sách đơn hàng đã được sắp xếp
@@ -44,6 +42,7 @@ const OrderManagerScreen = () => {
             filterOrdersByDate(new Date().toISOString().split('T')[0], sortedOrders);
         });
     }, []);
+
 
 
     const updateProductSoldQuantity = async (productId, quantityToAdd) => {
@@ -153,11 +152,17 @@ const OrderManagerScreen = () => {
     // Lọc danh sách đơn hàng theo ngày
     const filterOrdersByDate = (date, allOrders) => {
         const filtered = allOrders.filter(order => {
-            const orderDate = new Date(order.orderDate).toISOString().split('T')[0];
-            return orderDate === date;
+            if (!order.orderDate) return false; // Bỏ qua nếu orderDate không tồn tại
+
+            const orderDate = new Date(order.orderDate);
+            if (isNaN(orderDate)) return false; // Bỏ qua nếu orderDate không hợp lệ
+
+            return orderDate.toISOString().split('T')[0] === date;
         });
         setFilteredOrders(filtered);
     };
+
+
 
     // Xử lý khi chọn ngày
     const handleDateChange = (event) => {
@@ -182,17 +187,30 @@ const OrderManagerScreen = () => {
     };
 
 
-
     const updateOrdersList = () => {
         fetchOrders((data) => {
-            const updatedOrders = Object.keys(data).map(key => ({
-                ...data[key],
-                orderId: key,
-            }));
-            setOrders(updatedOrders);
-            filterOrdersByDate(selectedDate, updatedOrders);
+            if (!data || typeof data !== 'object') {
+                console.error("Dữ liệu không hợp lệ:", data);
+                return;
+            }
+
+            // Chuyển dữ liệu từ object sang array và thêm orderId
+            const updatedOrders = Object.keys(data)
+                .map(key => ({
+                    ...data[key],
+                    orderId: key,
+                }))
+                .filter(order => order.orderDate && !isNaN(new Date(order.orderDate))); // Lọc ra orderDate hợp lệ
+
+            // Sắp xếp theo ngày giảm dần (mới nhất lên đầu)
+            const sortedOrders = updatedOrders.sort((a, b) => new Date(b.orderDate) - new Date(a.orderDate));
+
+            // Lưu danh sách đơn hàng và lọc theo ngày được chọn
+            setOrders(sortedOrders);
+            filterOrdersByDate(selectedDate, sortedOrders);
         });
     };
+
 
 
     const openProductDetails = (order) => {

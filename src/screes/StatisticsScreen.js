@@ -69,11 +69,9 @@ const StatisticsManagement = () => {
     }
 
     if (selectedTab === 'products' && productSales) {
-      const topProducts = Object.entries(productSales)
-        .sort((a, b) => b[1] - a[1])
-        .slice(0, 5);
-      const productNames = topProducts.map(([name]) => name);
-      const productQuantities = topProducts.map(([_, quantity]) => quantity);
+      const allProducts = Object.entries(productSales);
+      const productNames = allProducts.map(([name]) => name);
+      const productQuantities = allProducts.map(([_, quantity]) => quantity);
 
       const products = {
         labels: productNames,
@@ -89,6 +87,7 @@ const StatisticsManagement = () => {
       };
       setProductData(products);
     }
+
 
     if (selectedTab === 'daily' && fetchedDailyStats) {
       const totalRevenue = Object.values(fetchedDailyStats).reduce((total, stats) => total + stats.totalRevenue, 0);
@@ -125,12 +124,18 @@ const StatisticsManagement = () => {
       <div className="filter-section">
         <DatePickerComponent onDateChange={handleDateChange} />
       </div>
+      <div className="total-revenue">
+          <strong>
+            Tổng doanh thu từ ngày {dayjs(dateRange.startDate).format('DD-MM-YYYY')} đến {dayjs(dateRange.endDate).format('DD-MM-YYYY')}:
+          </strong>
+          <span>{totalRevenue.toLocaleString()} VNĐ</span>
+        </div>
       <div className="tab-navigation">
         <button className={`tab ${selectedTab === 'revenue' ? 'active' : ''}`} onClick={() => setSelectedTab('revenue')}>
-          Doanh thu
+          Doanh thu theo tháng
         </button>
         <button className={`tab ${selectedTab === 'products' ? 'active' : ''}`} onClick={() => setSelectedTab('products')}>
-          Sản phẩm bán chạy
+          Sản phẩm 
         </button>
         <button className={`tab ${selectedTab === 'daily' ? 'active' : ''}`} onClick={() => setSelectedTab('daily')}>
           Doanh thu theo ngày
@@ -142,7 +147,24 @@ const StatisticsManagement = () => {
         ) : selectedTab === 'revenue' && revenueData ? (
           <Bar data={revenueData} options={{ maintainAspectRatio: false }} height={500} />
         ) : selectedTab === 'products' && productData ? (
-          <Bar data={productData} options={{ maintainAspectRatio: false }} height={500} />
+          <div>
+            <table>
+              <thead>
+                <tr>
+                  <th>Tên sản phẩm</th>
+                  <th>Số lượng bán</th>
+                </tr>
+              </thead>
+              <tbody>
+                {Object.entries(productData.datasets[0].data).map(([index, quantity]) => (
+                  <tr key={index}>
+                    <td>{productData.labels[index]}</td>
+                    <td>{quantity}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         ) : selectedTab === 'daily' && dailyStats.length > 0 ? (
           <div >
             <table>
@@ -163,13 +185,6 @@ const StatisticsManagement = () => {
                 ))}
               </tbody>
             </table>
-            {/* Thêm thông tin tổng doanh thu dưới bảng */}
-            <div className="total-revenue">
-              <strong>
-                Tổng doanh thu từ ngày {dayjs(dateRange.startDate).format('DD-MM-YYYY')} đến {dayjs(dateRange.endDate).format('DD-MM-YYYY')}:
-              </strong>
-              <span>{totalRevenue.toLocaleString()} VNĐ</span>
-            </div>
           </div>
         ) : (
           <p>Không có dữ liệu thống kê.</p>

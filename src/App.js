@@ -15,8 +15,6 @@ import { getDatabase, ref, update } from 'firebase/database'; // Import Firebase
 import { FaBox, FaUsers, FaClipboardList, FaChartBar, FaComments, FaTags, FaUserTie, FaStore, FaSignOutAlt } from 'react-icons/fa';
 import Fade from '@mui/material/Fade'; // Đảm bảo đã import Fade
 import { Close as X, ExitToApp as LogOut } from '@mui/icons-material';
-import MenuIcon from '@mui/icons-material/Menu'; // Import icon Menu
-
 
 
 import ChatBoxScreen from './screes/ChatBoxScreen';
@@ -25,21 +23,11 @@ import { db } from './firebaseConfig';
 import { ref as dbRef, onValue } from 'firebase/database';
 
 
-function Navbar({ onLogout, position, isDrawerOpen, setIsDrawerOpen }) {
+function Navbar({ onLogout, position }) {
   const navigate = useNavigate();
   const [openModal, setOpenModal] = useState(false); // State kiểm soát Modal
   const [selectedTab, setSelectedTab] = React.useState('');
-  
-
-
-
-
-
-  const toggleDrawer = () => {
-    setIsDrawerOpen((prev) => !prev);
-  };
-
-  const drawerWidth = isDrawerOpen ? 240 : 60;
+  const [isDrawerOpen, setIsDrawerOpen] = React.useState(true); // State kiểm soát Drawer
 
   const handlclick = () => {
     setOpenModal(true); // Mở Modal khi người dùng nhấn đăng xuất
@@ -162,13 +150,13 @@ function Navbar({ onLogout, position, isDrawerOpen, setIsDrawerOpen }) {
 
 
 
-  // const handleLogoutClick = () => {
-  //   const confirmLogout = window.confirm("Bạn có chắc chắn muốn đăng xuất không?");
-  //   if (confirmLogout) {
-  //     onLogout();
-  //     navigate('/');
-  //   }
-  // };
+  const handleLogoutClick = () => {
+    const confirmLogout = window.confirm("Bạn có chắc chắn muốn đăng xuất không?");
+    if (confirmLogout) {
+      onLogout();
+      navigate('/');
+    }
+  };
 
   const handleTabClick = (tab) => {
     setSelectedTab(tab);
@@ -194,34 +182,26 @@ function Navbar({ onLogout, position, isDrawerOpen, setIsDrawerOpen }) {
       <Drawer
         variant="permanent"
         sx={{
-          width: drawerWidth, // Chiều rộng thay đổi
+          width: 240,
           flexShrink: 0,
           [`& .MuiDrawer-paper`]: {
-            width: drawerWidth, // Chiều rộng thay đổi
+            width: 240,
             boxSizing: 'border-box',
             backgroundColor: '#1976d2',
             color: 'white',
-            transition: 'width 0.3s ease', // Hiệu ứng chuyển đổi
-            overflowX: 'hidden', // Ẩn nội dung khi thu hẹp
+            paddingTop: 1, // Giảm padding trên của Drawer
           },
         }}
       >
-        <Toolbar sx={{ justifyContent: 'space-between' }}>
-          <MenuIcon
-            onClick={toggleDrawer} // Đổi trạng thái
-            sx={{ cursor: 'pointer', color: 'white', marginLeft: 1 }}
+        <Toolbar>
+          <img
+            src={logo}
+            alt="logo"
+            style={{ width: 150, height: 150, marginRight: 16, cursor: 'pointer' }}
+            onClick={() => window.location.reload()}  // Thêm sự kiện reload khi nhấn vào logo
           />
-          {isDrawerOpen && (
-            <img
-              src={logo}
-              alt="logo"
-              style={{ width: 150, height: 150, cursor: 'pointer' }}
-              onClick={() => window.location.reload()}
-            />
-          )}
         </Toolbar>
 
-<<<<<<< HEAD
         <Box sx={{ overflow: 'auto', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', height: '100%', padding: 1 }}>
           <Box
             sx={{
@@ -235,11 +215,6 @@ function Navbar({ onLogout, position, isDrawerOpen, setIsDrawerOpen }) {
             }}
           >
             <List sx={{ padding: 0, margin: 0 }}> {/* Gỡ padding/margin thừa */}
-=======
-        {isDrawerOpen && (
-          <Box sx={{ overflow: 'auto', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', height: '100%', padding: 1 }}>
-            <List sx={{ padding: 0, margin: 0 }}>
->>>>>>> 3e42c5ec4780b245c0c0495baf4d88bd1ca674f6
               {filteredMenuItems.map((tab, index) => (
                 <ListItem
                   button
@@ -253,38 +228,21 @@ function Navbar({ onLogout, position, isDrawerOpen, setIsDrawerOpen }) {
                     '&:hover': {
                       backgroundColor: 'rgba(255, 255, 255, 0.2)',
                     },
-                    marginBottom: 0.5,
-                    padding: '10px 16px',
+                    '&.Mui-selected': {
+                      borderBottom: '2px solid white',
+                    },
+                    marginBottom: 0.5, // Giảm khoảng cách giữa các mục
+                    padding: '10px 16px', // Tăng giảm padding theo ý muốn
                   }}
                 >
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                    {tab.icon}
+                    {tab.icon} {/* Hiển thị icon */}
                     <ListItemText primary={tab.label} />
                   </Box>
                 </ListItem>
               ))}
             </List>
-            <ListItem
-              button
-              onClick={handlclick} // Mở Modal khi click nút Đăng xuất
-              sx={{
-                color: 'white',
-                justifyContent: 'center',
-                border: '2px solid green',
-                backgroundColor: 'green',
-                '&:hover': {
-                  backgroundColor: '#b71c1c',
-                },
-                borderRadius: '8px',
-              }}
-            >
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                <FaSignOutAlt />
-                <ListItemText primary="Đăng xuất" />
-              </Box>
-            </ListItem>
           </Box>
-<<<<<<< HEAD
 
           <ListItem
             button
@@ -308,13 +266,6 @@ function Navbar({ onLogout, position, isDrawerOpen, setIsDrawerOpen }) {
         </Box>
       </Drawer>
 
-=======
-        )}
-      </Drawer>
-
-
-
->>>>>>> 3e42c5ec4780b245c0c0495baf4d88bd1ca674f6
       {/* Modal xác nhận đăng xuất */}
       <Modal
         open={openModal}
@@ -398,11 +349,9 @@ function App() {
   const [isLoggedIn, setIsLoggedIn] = React.useState(() => {
     const savedLoginStatus = localStorage.getItem('isLoggedIn');
     const savedPosition = localStorage.getItem('position');
-    const savedUserId = localStorage.getItem('userId');
+    const savedUserId = localStorage.getItem('userId'); // Lưu userId của người dùng
     return { isLoggedIn: savedLoginStatus === 'true', position: savedPosition, userId: savedUserId };
   });
-
-  const [isDrawerOpen, setIsDrawerOpen] = React.useState(true); // Chỉ khai báo một lần
 
   // Hàm cập nhật trạng thái người dùng trong Firebase
   const updateUserStatus = async (userId, status) => {
@@ -420,13 +369,13 @@ function App() {
     localStorage.setItem('isLoggedIn', 'true');
     localStorage.setItem('position', userPosition);
     localStorage.setItem('userId', userId);
-    updateUserStatus(userId, 'online');
+    updateUserStatus(userId, 'online'); // Cập nhật status thành online khi đăng nhập
   };
 
   const handleLogout = () => {
     const { userId } = isLoggedIn;
     if (userId) {
-      updateUserStatus(userId, 'offline');
+      updateUserStatus(userId, 'offline'); // Cập nhật status thành offline khi đăng xuất
     }
     setIsLoggedIn({ isLoggedIn: false, position: null, userId: null });
     localStorage.removeItem('isLoggedIn');
@@ -436,10 +385,11 @@ function App() {
 
   return (
     <Router>
+
       {isLoggedIn.isLoggedIn ? (
         <>
-          <Navbar onLogout={handleLogout} position={isLoggedIn.position} isDrawerOpen={isDrawerOpen} setIsDrawerOpen={setIsDrawerOpen} />
-          <Box sx={{ p: 3, ml: isDrawerOpen ? 30 : 8 }}>
+          <Navbar onLogout={handleLogout} position={isLoggedIn.position} />
+          <Box sx={{ p: 3, ml: 30 }}>
             <Routes>
               <Route path="/" element={<OrderManagerScreen />} />
               {isLoggedIn.position === 'admin' && (
@@ -468,7 +418,5 @@ function App() {
     </Router>
   );
 }
-
-
 
 export default App;

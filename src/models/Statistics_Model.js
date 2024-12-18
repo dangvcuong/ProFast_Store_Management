@@ -1,93 +1,113 @@
 import { getDatabase, ref, get, query } from "firebase/database";
 import dayjs from "dayjs";
 
-/**
- * Hàm lấy dữ liệu thống kê từ Firebase
- * @param {string|null} startDate - Ngày bắt đầu (chuỗi định dạng "YYYY-MM-DD", ví dụ: "2024-01-01")
- * @param {string|null} endDate - Ngày kết thúc (chuỗi định dạng "YYYY-MM-DD", ví dụ: "2024-01-31")
- * @param {string} mode - Chế độ thống kê ("daily" hoặc "monthly")
- * @returns {Promise<{dailyStats?: Object, monthlyRevenue?: Object, productSales?: Object}>}
- */
 const fetchStatisticsData = async (startDate = null, endDate = null, mode = "monthly") => {
-    const db = getDatabase(); // Kết nối tới Firebase Database
-    const ordersRef = ref(db, "/orders"); // Đường dẫn tới danh sách đơn hàng trong Firebase
+    const db = getDatabase();
+    const ordersRef = ref(db, "/orders");
 
     try {
-        // Lấy tất cả đơn hàng từ Firebase
         const snapshot = await get(query(ordersRef));
         if (snapshot.exists()) {
-            const orders = snapshot.val(); // Dữ liệu đơn hàng
-            let dailyStats = {}; // Thống kê theo ngày
-            let monthlyRevenue = {}; // Thống kê doanh thu theo tháng
-            let productSales = {}; // Số lượng sản phẩm bán ra
+            const orders = snapshot.val();
+            let dailyStats = {};
+            let monthlyRevenue = {};
+            let productSales = {};
+            let orderStatusCounts = {
+                pending: 0,
+                confirmed: 0,
+                shipping: 0,
+                completed: 0,
+                cancelled: 0,
+            };
 
-            // Chuyển đổi startDate và endDate sang định dạng Date
             const start = startDate ? dayjs(startDate).startOf("day").toDate() : null;
             const end = endDate ? dayjs(endDate).endOf("day").toDate() : null;
 
-            // Xử lý từng đơn hàng
             Object.values(orders).forEach((order) => {
-                if (order.orderStatus === "Thành công") { // Chỉ xét các đơn hàng "Thành công"
-                    const orderDate = order.orderDate ? new Date(order.orderDate) : null;
-                    if (!orderDate || isNaN(orderDate)) return; // Bỏ qua đơn hàng không hợp lệ
+                const orderDate = order.orderDate ? new Date(order.orderDate) : null;
+                if (!orderDate || isNaN(orderDate)) return;
 
-                    // Lọc theo khoảng thời gian
-                    if ((start && orderDate < start) || (end && orderDate > end)) return;
+                if ((start && orderDate < start) || (end && orderDate > end)) return;
 
-                    // Định dạng theo ngày và tháng
-                    const formattedDate = dayjs(orderDate).format("YYYY-MM-DD"); // Ngày
-                    const monthYear = dayjs(orderDate).format("MM-YYYY"); // Tháng
+                const formattedDate = dayjs(orderDate).format("YYYY-MM-DD");
+                const monthYear = dayjs(orderDate).format("MM-YYYY");
 
-                    // === Thống kê theo ngày ===
-                    if (mode === "daily") {
-                        if (!dailyStats[formattedDate]) {
-                            dailyStats[formattedDate] = { totalOrders: 0, totalRevenue: 0 };
-                        }
-                        dailyStats[formattedDate].totalOrders += 1; // Tăng số đơn hàng
-                        const products = order.products || [];
-                        products.forEach((product) => {
-                            const productRevenue =
-                                parseFloat(product.price || "0") * parseInt(product.quantity || "0");
-                            dailyStats[formattedDate].totalRevenue += productRevenue;
-                        });
+                // Thống kê trạng thái đơn hàng
+                if (order.orderStatus === "Đang chờ xác nhận") {
+                    orderStatusCounts.pending++;
+                } else if (order.orderStatus === "Đã xác nhận") {
+                    orderStatusCounts.confirmed++;
+                } else if (order.orderStatus === "Đang giao hàng") {
+                    orderStatusCounts.shipping++;
+                } else if (order.orderStatus === "Thành công") {
+                    orderStatusCounts.completed++;
+                } else if (order.orderStatus === "Đã hủy") {
+                    orderStatusCounts.cancelled++;
+                }
+
+                // === Thống kê theo ngày ===
+                if (mode === "daily") {
+                    if (!dailyStats[formattedDate]) {
+                        dailyStats[formattedDate] = { totalOrders: 0, totalRevenue: 0, successfulOrders: 0, cancelledOrders: 0 };
                     }
+                    dailyStats[formattedDate].totalOrders += 1;
 
-                    // === Thống kê theo tháng ===
-                    if (mode === "monthly") {
+                    const products = order.products || [];
+                    let orderRevenue = 0; // Khởi tạo doanh thu cho đơn hàng này
+
+                    // Chỉ tính doanh thu nếu đơn hàng thành công
+                    if (order.orderStatus === "Thành công") {
+                        dailyStats[formattedDate].successfulOrders += 1;
+                        products.forEach((product) => {
+                            const productRevenue = parseFloat(product.price || "0") * parseInt(product.quantity || "0");
+                            orderRevenue += productRevenue; // Tính doanh thu cho đơn hàng
+                        });
+                        dailyStats[formattedDate].totalRevenue += orderRevenue; // Cộng doanh thu vào tổng doanh thu
+
+                        // Cập nhật số lượng sản phẩm đã bán
+                        products.forEach((product) => {
+                            const productName = product.name || "Sản phẩm không tên";
+                            productSales[productName] = (productSales[productName] || 0) + parseInt(product.quantity || "0");
+                        });
+                    } else if (order.orderStatus === "Đã hủy") {
+                        dailyStats[formattedDate].cancelledOrders += 1; // Tăng số đơn hàng đã hủy
+                    }
+                }
+
+                // Thống kê theo tháng
+                if (mode === "monthly") {
+                    if (order.orderStatus === "Thành công") {
                         if (!monthlyRevenue[monthYear]) {
                             monthlyRevenue[monthYear] = 0;
                         }
                         const products = order.products || [];
                         products.forEach((product) => {
-                            const productRevenue =
-                                parseFloat(product.price || "0") * parseInt(product.quantity || "0");
-                            monthlyRevenue[monthYear] += productRevenue;
+                            const productRevenue = parseFloat(product.price || "0") * parseInt(product.quantity || "0");
+                            monthlyRevenue[monthYear] += productRevenue; // Chỉ cộng doanh thu nếu đơn hàng thành công
 
-                            // Thống kê số lượng sản phẩm
+                            // Cập nhật số lượng sản phẩm đã bán
                             const productName = product.name || "Sản phẩm không tên";
-                            productSales[productName] =
-                                (productSales[productName] || 0) + parseInt(product.quantity || "0");
+                            productSales[productName] = (productSales[productName] || 0) + parseInt(product.quantity || "0");
                         });
                     }
                 }
             });
 
-            // Trả về dữ liệu theo chế độ
             if (mode === "daily") {
-                return { dailyStats };
+                return { dailyStats, orderStatusCounts, productSales };
             } else if (mode === "monthly") {
                 return { monthlyRevenue, productSales };
             }
         } else {
             console.log("Không có đơn hàng nào!");
             return mode === "daily"
-                ? { dailyStats: {} }
+                ? { dailyStats: {}, orderStatusCounts: {}, productSales: {} }
                 : { monthlyRevenue: {}, productSales: {} };
         }
     } catch (error) {
         console.error("Lỗi khi lấy dữ liệu thống kê:", error.message);
         return mode === "daily"
-            ? { dailyStats: {} }
+            ? { dailyStats: {}, orderStatusCounts: {}, productSales: {} }
             : { monthlyRevenue: {}, productSales: {} };
     }
 };

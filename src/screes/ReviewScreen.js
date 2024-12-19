@@ -86,25 +86,31 @@ const Reviews = () => {
 
     useEffect(() => {
         const reviewsRef = ref(db, 'reviews');
-
+    
         // Lắng nghe sự thay đổi dữ liệu từ Firebase
         const unsubscribe = onValue(reviewsRef, (snapshot) => {
             if (snapshot.exists()) {
                 const allReviews = [];
                 const data = snapshot.val();
-
+    
                 // Lặp qua các sản phẩm và thu thập đánh giá
                 Object.keys(data).forEach((productId) => {
                     const productReviews = data[productId];
                     Object.keys(productReviews).forEach((reviewId) => {
+                        const review = productReviews[reviewId];
+                        
                         allReviews.push({
                             id: reviewId,
                             productId,
-                            ...productReviews[reviewId],
+                            ...review,
+                            timestamp: new Date(review.timestamp).getTime(), // Chuyển đổi timestamp sang Unix Time
                         });
                     });
                 });
-
+    
+                // Sắp xếp đánh giá mới nhất lên đầu
+                allReviews.sort((a, b) => b.timestamp - a.timestamp);
+    
                 setReviews(allReviews); // Cập nhật danh sách đánh giá
             } else {
                 setReviews([]); // Trả về mảng rỗng nếu không có dữ liệu
@@ -112,10 +118,11 @@ const Reviews = () => {
         }, (error) => {
             setError('Không thể tải đánh giá. Vui lòng thử lại.');
         });
-
+    
         // Hủy lắng nghe khi component unmount
         return () => unsubscribe();
     }, []);
+    
 
     const handleDelete = (reviewId, productId) => {
         setReviewToDelete({ reviewId, productId });

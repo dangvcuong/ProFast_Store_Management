@@ -245,7 +245,10 @@ const Personnel_management = () => {
 
                 {confirmDialog && (
                     <div className="confirmation-dialog">
-                        <div className="dialog-content">
+                        <div style={{
+                            width: 500, height: 100, backgroundColor: "white", textAlign: 'center',
+                            borderRadius: 10, padding: 20
+                        }}>
                             <h3>Xác nhận xóa nhân viên này không?</h3>
 
                             <div className="dialog-footer">

@@ -129,7 +129,10 @@ const Customer_managenments = () => {
                 </table>
                 {confirmDialog && (
                     <div className="confirmation-dialog">
-                        <div className="dialog-content">
+                        <div className="dialog-content" style={{
+                            width: 500, height: 120, backgroundColor: "white", textAlign: 'center',
+                            borderRadius: 10, padding: 20
+                        }} >
                             <h3>Xác nhận khóa tài khoản này?</h3>
 
                             <div className="dialog-footer">

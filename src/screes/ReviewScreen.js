@@ -46,6 +46,8 @@ const Reviews = () => {
     const [reviews, setReviews] = useState([]);
     const [error, setError] = useState(null);
     const [selectedReview, setSelectedReview] = useState(null); // State modal chi tiết
+    const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+    const [reviewToDelete, setReviewToDelete] = useState(null); // Đánh giá cần xóa
 
     useEffect(() => {
         const reviewsRef = ref(db, 'reviews');
@@ -80,12 +82,21 @@ const Reviews = () => {
         return () => unsubscribe();
     }, []);
 
-    const handleDelete = async (reviewId, productId) => {
-        try {
-            const reviewRef = ref(db, `reviews/${productId}/${reviewId}`);
-            await remove(reviewRef);
-        } catch (err) {
-            setError('Không thể xóa đánh giá. Vui lòng thử lại.');
+    const handleDelete = (reviewId, productId) => {
+        setReviewToDelete({ reviewId, productId });
+        setShowDeleteDialog(true);
+    };
+    const confirmDelete = async () => {
+        if (reviewToDelete) {
+            const { reviewId, productId } = reviewToDelete;
+            try {
+                const reviewRef = ref(db, `reviews/${productId}/${reviewId}`);
+                await remove(reviewRef);
+                setShowDeleteDialog(false);
+                setReviewToDelete(null); // Reset reviewToDelete
+            } catch (err) {
+                setError('Không thể xóa đánh giá. Vui lòng thử lại.');
+            }
         }
     };
 
@@ -118,6 +129,25 @@ const Reviews = () => {
                     ))}
                 </tbody>
             </table>
+
+            {showDeleteDialog && (
+    <div className="confirmation-dialog">
+        <div style={{
+            width: 500, height: 100, backgroundColor: "white", textAlign: 'center',
+            borderRadius: 10, padding: 20
+        }}>
+            <h3>Bạn có chắc chắn muốn xóa đánh giá này?</h3>
+            <div className="dialog-footer">
+                <button onClick={confirmDelete} style={{
+                    color: 'white', backgroundColor: '#2196F3',
+                }}>Đồng ý</button>
+                <button onClick={() => { setShowDeleteDialog(false); setReviewToDelete(null); }} style={{
+                    color: 'white', backgroundColor: '#2196F3',
+                }}>Không</button>
+            </div>
+        </div>
+    </div>
+)}
 
             {/* Hiển thị modal khi selectedReview có giá trị */}
             {selectedReview && (

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { db } from '../firebaseConfig';
-import { get, ref, update, remove } from 'firebase/database';
+import { ref, onValue, update, remove } from 'firebase/database';
 
 // Hàm render đánh giá sao
 const renderStars = (rating) => {
@@ -44,92 +44,51 @@ const ReviewDetailModal = ({ review, onClose }) => {
 
 const Reviews = () => {
     const [reviews, setReviews] = useState([]);
-    const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [productIds, setProductIds] = useState([]);
     const [selectedReview, setSelectedReview] = useState(null); // State modal chi tiết
 
-    const fetchProductIds = async () => {
-        try {
-            const productRef = ref(db, 'products');
-            const snapshot = await get(productRef);
+    useEffect(() => {
+        const reviewsRef = ref(db, 'reviews');
 
+        // Lắng nghe sự thay đổi dữ liệu từ Firebase
+        const unsubscribe = onValue(reviewsRef, (snapshot) => {
             if (snapshot.exists()) {
-                const productsData = snapshot.val();
-                const productIdsArray = Object.keys(productsData);
-                setProductIds(productIdsArray);
+                const allReviews = [];
+                const data = snapshot.val();
+
+                // Lặp qua các sản phẩm và thu thập đánh giá
+                Object.keys(data).forEach((productId) => {
+                    const productReviews = data[productId];
+                    Object.keys(productReviews).forEach((reviewId) => {
+                        allReviews.push({
+                            id: reviewId,
+                            productId,
+                            ...productReviews[reviewId],
+                        });
+                    });
+                });
+
+                setReviews(allReviews); // Cập nhật danh sách đánh giá
             } else {
-                setProductIds([]);
+                setReviews([]); // Trả về mảng rỗng nếu không có dữ liệu
             }
-        } catch (err) {
-            setError('Không thể tải danh sách sản phẩm. Vui lòng thử lại.');
-        }
-    };
-
-    useEffect(() => {
-        fetchProductIds();
-    }, []);
-
-    useEffect(() => {
-        if (productIds.length > 0) {
-            setLoading(true);
-            Promise.all(productIds.map(productId => fetchReviews(productId)))
-                .then(() => setLoading(false))
-                .catch(err => {
-                    setError('Có lỗi khi tải dữ liệu');
-                    setLoading(false);
-                });
-        }
-    }, [productIds]);
-
-    const fetchReviews = async (productId) => {
-        try {
-            const reviewRef = ref(db, `reviews/${productId}`);
-            const snapshot = await get(reviewRef);
-
-            if (snapshot.exists()) {
-                const reviewsData = snapshot.val();
-                const reviewsArray = Object.keys(reviewsData).map(key => ({
-                    id: key,
-                    productId,
-                    ...reviewsData[key],
-                }));
-
-                setReviews((prevReviews) => {
-                    const newReviews = reviewsArray.filter((review) =>
-                        !prevReviews.some((r) => r.id === review.id)
-                    );
-                    return [...prevReviews, ...newReviews];
-                });
-            }
-        } catch (err) {
+        }, (error) => {
             setError('Không thể tải đánh giá. Vui lòng thử lại.');
-        }
-    };
+        });
 
-    const handleConfirm = async (reviewId, productId) => {
-        try {
-            const reviewRef = ref(db, `reviews/${productId}/${reviewId}`);
-            await update(reviewRef, { status: 'đã xác nhận' });
-            setReviews((prevReviews) => prevReviews.map((review) =>
-                review.id === reviewId ? { ...review, status: 'đã xác nhận' } : review
-            ));
-        } catch (err) {
-            setError('Không thể xác nhận đánh giá. Vui lòng thử lại.');
-        }
-    };
+        // Hủy lắng nghe khi component unmount
+        return () => unsubscribe();
+    }, []);
 
     const handleDelete = async (reviewId, productId) => {
         try {
             const reviewRef = ref(db, `reviews/${productId}/${reviewId}`);
             await remove(reviewRef);
-            setReviews((prevReviews) => prevReviews.filter((review) => review.id !== reviewId));
         } catch (err) {
             setError('Không thể xóa đánh giá. Vui lòng thử lại.');
         }
     };
 
-    if (loading) return <p>Đang tải đánh giá...</p>;
     if (error) return <p>{error}</p>;
 
     return (

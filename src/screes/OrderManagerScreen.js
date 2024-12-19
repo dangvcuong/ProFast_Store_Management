@@ -147,16 +147,23 @@ const OrderManagerScreen = () => {
 
     // Lọc danh sách đơn hàng theo ngày
     const filterOrdersByDate = (date, allOrders) => {
-        const filtered = allOrders.filter(order => {
-            if (!order.orderDate) return false; // Bỏ qua nếu orderDate không tồn tại
+        // Kiểm tra allOrders có phải là mảng không
+        if (!Array.isArray(allOrders)) {
+            console.error("allOrders không phải là mảng:", allOrders);
+            return;
+        }
 
+        const filtered = allOrders.filter(order => {
+            if (!order.orderDate) return false; // Bỏ qua nếu không có orderDate
             const orderDate = new Date(order.orderDate);
             if (isNaN(orderDate)) return false; // Bỏ qua nếu orderDate không hợp lệ
 
-            return orderDate.toISOString().split('T')[0] === date;
+            return orderDate.toISOString().split('T')[0] === date; // So sánh ngày
         });
+
         setFilteredOrders(filtered);
     };
+
 
 
     // Xử lý khi chọn ngày

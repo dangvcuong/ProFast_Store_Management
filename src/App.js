@@ -89,67 +89,6 @@ function Navbar({ onLogout, position }) {
     }
   };
 
-
-
-  // Lắng nghe thay đổi trong Firebase Realtime Database (Đơn hàng)
-  // const [notifiedOrders, setNotifiedOrders] = useState(new Set()); // Dùng Set để lưu trữ các ID đơn hàng đã thông báo
-
-  // useEffect(() => {
-  //   // Kiểm tra quyền thông báo
-  //   if ("Notification" in window) {
-  //     Notification.requestPermission()
-  //       .then((permission) => {
-  //         if (permission !== "granted") {
-  //           console.warn("Notification permission not granted");
-  //         }
-  //       })
-  //       .catch((error) => console.error("Notification request error:", error));
-  //   }
-
-  //   // Lắng nghe thay đổi trong Firebase Realtime Database (Đơn hàng)
-  //   const ordersRef = dbRef(db, "orders/"); // Giả sử bạn lưu đơn hàng trong 'orders/'
-  //   const unsubscribe = onValue(ordersRef, handleNewOrders);
-
-  //   // Hủy lắng nghe khi component unmount
-  //   return () => unsubscribe();
-  // }, []);
-
-  // // Hàm xử lý khi có đơn hàng mới
-  // const handleNewOrders = (snapshot) => {
-  //   const data = snapshot.val();
-  //   if (!data) return;
-
-  //   // Duyệt qua các đơn hàng
-  //   Object.keys(data).forEach((orderId) => {
-  //     const order = data[orderId];
-
-  //     // Kiểm tra nếu đơn hàng có trạng thái là "Đang chờ xác nhận" và chưa được thông báo
-  //     if (order.orderStatus === "Đang chờ xác nhận" && !notifiedOrders.has(orderId)) {
-  //       // Hiển thị thông báo cho đơn hàng mới
-  //       showNotifications({
-  //         orderId: orderId,
-  //         customerName: order.customerName || "Khách hàng mới",
-  //         orderDetails: order.details || "Chi tiết đơn hàng chưa có",
-  //       });
-
-  //       // Thêm ID đơn hàng vào mảng notifiedOrders để tránh thông báo lại
-  //       setNotifiedOrders((prev) => new Set(prev).add(orderId));
-  //     }
-  //   });
-  // };
-
-  // // Hàm hiển thị thông báo
-  // const showNotifications = (order) => {
-  //   if ("Notification" in window && Notification.permission === "granted") {
-  //     new Notification("Đơn hàng mới", {
-  //       body: `Đơn hàng của ${order.customerName}: ${order.orderDetails}`,
-  //       icon: "https://via.placeholder.com/50", // Bạn có thể thay bằng icon cho đơn hàng
-  //     });
-  //   }
-  // };
-
-
-
   const handleLogoutClick = () => {
     const confirmLogout = window.confirm("Bạn có chắc chắn muốn đăng xuất không?");
     if (confirmLogout) {

@@ -17,7 +17,41 @@ const renderStars = (rating) => {
 
 // Modal xem chi tiết
 const ReviewDetailModal = ({ review, onClose }) => {
+    const [isExpanded, setIsExpanded] = useState(false); // Trạng thái điều khiển rút gọn/mở rộng
+
     if (!review) return null;
+
+    // Hàm xử lý rút gọn nội dung
+    const renderReviewContent = () => {
+        if (review.review.length > 70) {
+            if (isExpanded) {
+                return (
+                    <>
+                        {review.review}
+                        <button
+                            onClick={() => setIsExpanded(false)}
+                            style={{ color: '#2196F3', marginLeft: '0px', border: 'none', background: 'none', cursor: 'pointer' }}
+                        >
+                            Thu gọn
+                        </button>
+                    </>
+                );
+            } else {
+                return (
+                    <>
+                        {review.review.slice(0, 70)}...
+                        <button
+                            onClick={() => setIsExpanded(true)}
+                            style={{ color: '#2196F3', marginLeft: '0px', border: 'none', background: 'none', cursor: 'pointer' }}
+                        >
+                            Xem thêm
+                        </button>
+                    </>
+                );
+            }
+        }
+        return review.review;
+    };
 
     return (
         <div style={{
@@ -32,7 +66,7 @@ const ReviewDetailModal = ({ review, onClose }) => {
                 <h2>Chi tiết đánh giá</h2>
                 <p><strong>Tên sản phẩm:</strong> {review.nameProduct}</p>
                 <p><strong>Người dùng:</strong> {review.userName}</p>
-                <p><strong>Nội dung:</strong> {review.review}</p>
+                <p><strong>Nội dung:</strong> {renderReviewContent()}</p>
                 <p><strong>Đánh giá sao:</strong> {renderStars(review.rating)}</p>
                 <div style={{ textAlign: 'right' }}>
                     <button onClick={onClose} style={{ marginTop: '10px' }}>Đóng</button>
@@ -41,6 +75,7 @@ const ReviewDetailModal = ({ review, onClose }) => {
         </div>
     );
 };
+
 
 const Reviews = () => {
     const [reviews, setReviews] = useState([]);
@@ -86,6 +121,12 @@ const Reviews = () => {
         setReviewToDelete({ reviewId, productId });
         setShowDeleteDialog(true);
     };
+    const truncateReview = (text, maxLength = 30) => {
+        if (text.length > maxLength) {
+            return `${text.slice(0, maxLength)}...`;
+        }
+        return text;
+    };
     const confirmDelete = async () => {
         if (reviewToDelete) {
             const { reviewId, productId } = reviewToDelete;
@@ -120,7 +161,7 @@ const Reviews = () => {
                         <tr key={review.id}>
                             <td onClick={() => setSelectedReview(review)}>{review.nameProduct}</td>
                             <td>{review.userName}</td>
-                            <td>{review.review}</td>
+                            <td>{truncateReview(review.review)}</td>
                             <td>{renderStars(review.rating)}</td>
                             <td>
                                 <button onClick={() => handleDelete(review.id, review.productId)}>Xóa</button>

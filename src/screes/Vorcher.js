@@ -196,7 +196,17 @@ const Vorcher = () => {
                             name="soluong"
                             placeholder="Số lượng"
                             value={form.soluong}
-                            onChange={handleInputChange}
+                            onChange={(e) => {
+                                const value = e.target.value;
+                                // Chỉ cho phép nhập số không âm
+                                if (value >= 0) {
+                                    setForm((prevForm) => ({
+                                        ...prevForm,
+                                        soluong: value,
+                                    }));
+                                }
+                            }}
+                            min="0" // Ngăn không cho nhập số âm
                             style={{
                                 marginBottom: '10px',
                                 flex: 1,
@@ -268,23 +278,23 @@ const Vorcher = () => {
                 </tbody>
             </table>
             {showDeleteDialog && (
-    <div className="confirmation-dialog">
-        <div style={{
-            width: 500, height: 100, backgroundColor: "white", textAlign: 'center',
-            borderRadius: 10, padding: 20
-        }}>
-            <h3>Bạn có chắc chắn muốn xóa voucher này?</h3>
-            <div className="dialog-footer">
-                <button onClick={confirmDelete} style={{
-                    color: 'white', backgroundColor: '#2196F3',
-                }}>Đồng ý</button>
-                <button onClick={() => { setShowDeleteDialog(false); setVoucherToDelete(null); }} style={{
-                    color: 'white', backgroundColor: '#2196F3',
-                }}>Không</button>
-            </div>
-        </div>
-    </div>
-)}
+                <div className="confirmation-dialog">
+                    <div style={{
+                        width: 500, height: 100, backgroundColor: "white", textAlign: 'center',
+                        borderRadius: 10, padding: 20
+                    }}>
+                        <h3>Bạn có chắc chắn muốn xóa voucher này?</h3>
+                        <div className="dialog-footer">
+                            <button onClick={confirmDelete} style={{
+                                color: 'white', backgroundColor: '#2196F3',
+                            }}>Đồng ý</button>
+                            <button onClick={() => { setShowDeleteDialog(false); setVoucherToDelete(null); }} style={{
+                                color: 'white', backgroundColor: '#2196F3',
+                            }}>Không</button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

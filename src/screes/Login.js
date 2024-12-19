@@ -9,6 +9,7 @@ const LoginScreen = ({ onLoginSuccess }) => {
     const [errorMessage, setErrorMessage] = useState(null);
     const [ten, setTen] = useState();
     const [pass, setPass] = useState();
+    
     const handleLogin = async (username, password) => {
         if (username === "" || password === "") {
             setTen("Vui lòng nhập đầy đủ thông tin");
@@ -52,7 +53,7 @@ const LoginScreen = ({ onLoginSuccess }) => {
         <View style={styles.container}>
             <View style={styles.box1}>
                 <Text style={styles.logoText}>GroFast</Text>
-                <Text style={styles.subtitle}>Chào mừng quay chở lại</Text>
+                <Text style={styles.subtitle}>Chào mừng quay trở lại</Text>
                 <TextInput
                     placeholder="Nhập tên đăng nhập"
                     value={username}

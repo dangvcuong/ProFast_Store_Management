@@ -290,7 +290,14 @@ const ProductManagement = () => {
                             placeholder="Nhập số lượng"
                             type="number"
                             value={quantity}
-                            onChange={(e) => setQuantity(e.target.value)}
+                            onChange={(e) => {
+                                const value = e.target.value;
+                                // Chỉ cho phép nhập số không âm
+                                if (value >= 0) {
+                                    setQuantity(value);
+                                }
+                            }}
+                            min="0" // Ngăn không cho nhập số âm
                             style={{
                                 marginBottom: '10px',
                                 flex: 1,
@@ -322,7 +329,15 @@ const ProductManagement = () => {
                             placeholder="Đánh giá"
                             type="number"
                             value={evaluate}
-                            onChange={(e) => setEvaluate(e.target.value)}
+                            onChange={(e) => {
+                                const value = e.target.value;
+                                // Chỉ cho phép nhập số không âm và tối đa 5
+                                if (value >= 0 && value <= 5) {
+                                    setEvaluate(value);
+                                }
+                            }}
+                            min="0" // Ngăn không cho nhập số âm
+                            max="5" // Giới hạn đánh giá tối đa là 5
                             style={{
                                 marginBottom: '10px',
                                 flex: 1,

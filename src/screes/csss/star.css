@@ -1,0 +1,5 @@
+.empty-star {
+    color: rgb(11, 10, 10) !important; /* Đảm bảo ưu tiên sử dụng màu xám */
+    font-size: 20px;
+    margin: 0 2px;
+}

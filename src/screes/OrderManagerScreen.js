@@ -125,7 +125,6 @@ const OrderManagerScreen = () => {
                 }
             } else {
                 console.error('Danh sách sản phẩm không hợp lệ hoặc không tồn tại.');
-
                 return;
             }
 
@@ -137,12 +136,13 @@ const OrderManagerScreen = () => {
             }
 
             // Làm mới danh sách đơn hàng
-            fetchOrders(setOrders);
+            updateOrdersList(); // Gọi lại để tải lại danh sách đơn hàng mới
         } catch (error) {
             console.error('Lỗi khi xử lý cập nhật đơn hàng:', error);
             alert('Đã xảy ra lỗi trong quá trình xử lý. Vui lòng thử lại.');
         }
     };
+
 
 
     // Lọc danh sách đơn hàng theo ngày

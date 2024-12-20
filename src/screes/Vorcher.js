@@ -12,30 +12,43 @@ const Vorcher = () => {
 
     useEffect(() => {
         const db = getDatabase(app);
-        const usersRef = ref(db, "vouchers");
-        onValue(usersRef, (snapshot) => {
+        const vouchersRef = ref(db, "vouchers");
+
+        onValue(vouchersRef, (snapshot) => {
             const data = snapshot.val();
+
             if (data) {
                 const currentDate = new Date();
-                const voucherList = Object.keys(data).map((key) => {
-                    const voucher = { id: key, ...data[key] };
-                    const expiryDate = new Date(voucher.ngayHetHan);
 
-                    // Tự động cập nhật trạng thái nếu cần
-                    const status = expiryDate >= currentDate ? "Còn hạn" : "Hết hạn";
-                    if (voucher.status !== status) {
-                        const voucherRef = ref(db, `vouchers/${key}`);
-                        update(voucherRef, { status });
-                    }
+                // Chuyển dữ liệu thành mảng và cập nhật trạng thái
+                const voucherList = Object.keys(data)
+                    .map((key) => {
+                        const voucher = { id: key, ...data[key] };
+                        const expiryDate = new Date(voucher.ngayHetHan);
 
-                    return { ...voucher, status };
-                });
+                        // Cập nhật trạng thái "Còn hạn" hoặc "Hết hạn"
+                        const status = expiryDate >= currentDate ? "Còn hạn" : "Hết hạn";
+                        if (voucher.status !== status) {
+                            const voucherRef = ref(db, `vouchers/${key}`);
+                            update(voucherRef, { status });
+                        }
+
+                        return { ...voucher, status };
+                    })
+                    // Sắp xếp giảm dần theo ngày tạo (ngayTao)
+                    .sort((a, b) => {
+                        const dateA = new Date(a.ngayTao);  // Chuyển ngày tạo thành đối tượng Date
+                        const dateB = new Date(b.ngayTao);  // Chuyển ngày tạo thành đối tượng Date
+                        return dateB - dateA; // Sắp xếp theo thứ tự giảm dần
+                    });
+
                 setVouchers(voucherList);
             } else {
                 setVouchers([]);
             }
         });
     }, []);
+
 
 
     const handleInputChange = (e) => {

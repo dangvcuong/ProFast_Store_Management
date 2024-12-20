@@ -174,7 +174,8 @@ const CompanyScreen = () => {
             </table>
             {confirmDialog && (
                 <div className="confirmation-dialog">
-                    <div className="dialog-content">
+
+                    <div className="dialog-content" style={{ height: 120 }}>
                         <h3>Xác nhận xóa danh mục này không?</h3>
 
                         <div className="dialog-footer">
@@ -188,6 +189,7 @@ const CompanyScreen = () => {
                             }}>Không</button>
                         </div>
                     </div>
+
                 </div>
             )}
         </div>

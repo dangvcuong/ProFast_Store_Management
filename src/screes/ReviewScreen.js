@@ -2,7 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { db } from '../firebaseConfig';
 import { ref, onValue, update, remove } from 'firebase/database';
 import '../screes/csss/star.css';
+import { Dimensions } from 'react-native';
+
 // Hàm render đánh giá sao
+const { height, width } = Dimensions.get('window');
+
 const renderStars = (rating) => {
     const stars = [];
     for (let i = 1; i <= 5; i++) {
@@ -24,7 +28,7 @@ const renderStars = (rating) => {
                         WebkitTextFillColor: 'transparent',
                     }}
                 >
-                     ★
+                    ★
                 </span>
             );
         } else {
@@ -83,7 +87,7 @@ const ReviewDetailModal = ({ review, onClose }) => {
             position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
             backgroundColor: 'rgba(0, 0, 0, 0.5)', display: 'flex',
             justifyContent: 'center', alignItems: 'center',
-          }}>
+        }}>
             <div className="modal-container" style={{
                 backgroundColor: 'white', padding: '20px', borderRadius: '8px',
                 width: '500px', boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)'
@@ -188,7 +192,7 @@ const Reviews = () => {
                         <th>Hành động</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody style={{ height: height * 0.7 }}>
                     {reviews.map((review) => (
                         <tr key={review.id}>
                             <td onClick={() => setSelectedReview(review)}>{review.nameProduct}</td>

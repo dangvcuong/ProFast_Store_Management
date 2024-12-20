@@ -61,9 +61,19 @@ const ProductManagement = () => {
         const productsRef = dbRef(db, '/products');
         onValue(productsRef, (snapshot) => {
             const data = snapshot.val();
-            setProducts(data || {});
+
+            if (data) {
+                // Chuyển đối tượng thành mảng và sắp xếp theo `dateOfEntry` giảm dần
+                const sortedProducts = Object.entries(data)
+                    .map(([id, product]) => ({ id, ...product })) // Thêm ID sản phẩm vào đối tượng
+                    .sort((a, b) => new Date(b.dateOfEntry) - new Date(a.dateOfEntry)); // Sắp xếp giảm dần theo thời gian
+
+                setProducts(sortedProducts);
+            } else {
+                setProducts([]);
+            }
         });
-    };
+    }
 
     const loadCompanies = async () => {
         const companiesData = await getCompany();
@@ -457,7 +467,7 @@ const ProductManagement = () => {
                                 <img
                                     src={products[key].imageUrl}
                                     alt="Product"
-                                    
+
                                     onError={(e) => e.target.src = "https://via.placeholder.com/50"}
                                 />
                             </td>

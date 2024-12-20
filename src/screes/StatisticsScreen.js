@@ -210,7 +210,7 @@ const StatisticsManagement = () => {
           <Bar data={revenueData} options={{ maintainAspectRatio: false }} height={500} />
         ) : selectedTab === 'products' && productData ? (
           <div>
-            <table>
+            <table className="tb-sp">
               <thead>
                 <tr>
                   <th>Tên sản phẩm</th>
@@ -229,7 +229,7 @@ const StatisticsManagement = () => {
           </div>
         ) : selectedTab === 'daily' && dailyStats.length > 0 ? (
           <div>
-            <table>
+            <table className="tb-ngay">
               <thead>
                 <tr>
                   <th>Ngày</th>

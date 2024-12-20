@@ -218,3 +218,92 @@ table tbody tr {
     color: #333;
     line-height: 1.5;
 }
+/* Thu nhỏ toàn bộ ở màn hình 1280px */
+@media (max-width: 1280px) {
+    body {
+        font-size: 14px; /* Giảm kích thước font chung */
+    }
+    .table-container td:first-child,
+    .table-container th:first-child{
+        width: 10%; 
+    }
+    .loc-sp{
+        margin-right: 100px;
+    }
+
+    .container {
+        max-width: 1100px;
+        padding: 15px;
+    }
+
+    h1 {
+        font-size: 22px; /* Giảm kích thước tiêu đề */
+    }
+
+    button {
+        font-size: 12px;
+        padding: 6px 10px;
+    }
+
+    table thead th, table tbody td {
+        font-size: 12px; /* Giảm kích thước văn bản trong bảng */
+        padding: 8px;
+    }
+
+    .product-item {
+        padding: 8px;
+        width: calc(33.33% - 10px); /* Chuyển về 3 cột */
+    }
+
+    .dialog-content {
+        padding: 15px;
+        max-width: 450px;
+    }
+}
+
+/* Thu nhỏ toàn bộ ở màn hình 960px */
+@media (max-width: 960px) {
+    body {
+        font-size: 12px; /* Giảm kích thước font hơn nữa */
+    }
+    .loc-sp{
+        margin-right: 100px;
+    }
+
+    .container {
+        max-width: 90%;
+        padding: 10px;
+    }
+
+    h1 {
+        font-size: 18px; /* Giảm kích thước tiêu đề */
+    }
+
+    button {
+        font-size: 10px;
+        padding: 4px 8px;
+    }
+
+    table thead th, table tbody td {
+        font-size: 10px; /* Giảm kích thước văn bản trong bảng */
+        padding: 6px;
+    }
+
+    .product-item {
+        padding: 6px;
+        width: calc(50% - 10px); /* Chuyển về 2 cột */
+    }
+
+    .dialog-content {
+        padding: 10px;
+        max-width: 300px;
+    }
+
+    .product-description {
+        font-size: 10px; /* Giảm kích thước mô tả sản phẩm */
+    }
+
+    .toggle-btn {
+        font-size: 10px;
+    }
+}

@@ -202,6 +202,20 @@ canvas {
 .dialog button:hover {
   background-color: #0056b3;
 }
+@media (max-width: 1280px) {
+  body {
+      font-size: 14px; /* Giảm kích thước font chung */
+  }
+  .tb-sp td:first-child,
+  .tb-sp th:first-child{
+      width: 40%; 
+  }
+  .tb-ngay td:first-child,
+  .tb-ngay th:first-child{
+      width: 30%; 
+  }
 
+  
+}
 
 

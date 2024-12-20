@@ -405,7 +405,7 @@ const ProductManagement = () => {
 
 
                 </div>
-                <div style={{ flex: 1 }}>
+                <div className="loc-sp" style={{ flex: 1 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '20px', }}>
                         <div style={{}}>
                             <h3>Lọc sản phẩm theo hãng</h3>

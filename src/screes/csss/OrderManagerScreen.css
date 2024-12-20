@@ -366,6 +366,9 @@ table tbody tr {
     .container {
         padding: 15px;
     }
+    .confirmation-dialog{
+        margin-left: 100px;
+    }
     thead th:first-child, 
 tbody td:first-child {
     width: 20px; /* Điều chỉnh chiều rộng của cột STT */
@@ -388,6 +391,9 @@ tbody td:first-child {
 
     .dialog-content {
         max-width: 600px;
+    }
+    .product-details-dialog {
+        margin-left: 100px;
     }
 }
 

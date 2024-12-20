@@ -3,3 +3,105 @@
     font-size: 20px;
     margin: 0 2px;
 }
+/* Độ phân giải nhỏ hơn hoặc bằng 1280px */
+@media (max-width: 1280px) {
+    body {
+        font-size: 15px;
+    }
+    .modal-container {
+        background-color: #fff;
+        border-radius: 10px;
+        padding: 15px; /* Giảm padding */
+        width: 400px; /* Thu nhỏ chiều rộng */
+        max-width: 90%; /* Đảm bảo phù hợp trên màn hình nhỏ */
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        animation: fadeIn 0.3s ease-in-out;
+        margin-left: 150px;
+    }
+    
+    .modal-container h2 {
+        font-size: 20px; /* Giảm kích thước tiêu đề */
+        margin-bottom: 10px;
+        text-align: center;
+    }
+    
+    .modal-container p {
+        margin: 5px 0; /* Giảm khoảng cách giữa các đoạn */
+        font-size: 14px; /* Giảm kích thước chữ */
+    }
+    
+    .modal-container button {
+        padding: 6px 12px; /* Thu nhỏ nút */
+        font-size: 14px; /* Giảm kích thước chữ trong nút */
+    }
+
+    table {
+        font-size: 14px;
+    }
+
+    th, td {
+        padding: 8px;
+    }
+
+    button {
+        font-size: 14px;
+    }
+    .review-table td:first-child,
+    .review-table th:first-child {
+        width: 30%; /* Tăng chiều rộng cột đầu tiên */
+    }
+}
+
+/* Độ phân giải nhỏ hơn hoặc bằng 960px */
+@media (max-width: 960px) {
+    body {
+        font-size: 14px;
+    }
+    .modal-container {
+        background-color: #fff;
+        border-radius: 10px;
+        padding: 15px; /* Giảm padding */
+        width: 300px; /* Thu nhỏ chiều rộng */
+        max-width: 90%; /* Đảm bảo phù hợp trên màn hình nhỏ */
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        animation: fadeIn 0.3s ease-in-out;
+        margin-left: 150px;
+    }
+    
+    .modal-container h2 {
+        font-size: 20px; /* Giảm kích thước tiêu đề */
+        margin-bottom: 10px;
+        text-align: center;
+    }
+    
+    .modal-container p {
+        margin: 5px 0; /* Giảm khoảng cách giữa các đoạn */
+        font-size: 14px; /* Giảm kích thước chữ */
+    }
+    
+    .modal-container button {
+        padding: 6px 12px; /* Thu nhỏ nút */
+        font-size: 14px; /* Giảm kích thước chữ trong nút */
+    }
+    .review-table td:first-child,
+    .review-table th:first-child {
+        width: 25%; /* Tăng chiều rộng cột đầu tiên */
+    }
+    table {
+        font-size: 13px;
+    }
+
+    th, td {
+        padding: 6px;
+    }
+
+    button {
+        font-size: 12px;
+    }
+
+    /* Thay đổi layout nếu cần */
+    .confirmation-dialog {
+        width: 90%; /* Giảm chiều rộng modal */
+        
+    }
+}

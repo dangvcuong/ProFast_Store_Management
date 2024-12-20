@@ -81,7 +81,8 @@ const StatisticsManagement = () => {
     }
 
     if (selectedTab === 'products' && productSales) {
-      const allProducts = Object.entries(productSales);
+      const allProducts = Object.entries(productSales)
+      .sort(([, quantityA], [, quantityB]) => quantityB - quantityA);
       const productNames = allProducts.map(([name]) => name);
       const productQuantities = allProducts.map(([_, quantity]) => quantity);
 

@@ -79,12 +79,12 @@ const ReviewDetailModal = ({ review, onClose }) => {
     };
 
     return (
-        <div style={{
+        <div className="modal-overlay" style={{
             position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
             backgroundColor: 'rgba(0, 0, 0, 0.5)', display: 'flex',
             justifyContent: 'center', alignItems: 'center',
-        }}>
-            <div style={{
+          }}>
+            <div className="modal-container" style={{
                 backgroundColor: 'white', padding: '20px', borderRadius: '8px',
                 width: '500px', boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)'
             }}>
@@ -178,7 +178,7 @@ const Reviews = () => {
     return (
         <div>
             <h1>Danh sách đánh giá</h1>
-            <table>
+            <table className="review-table">
                 <thead>
                     <tr>
                         <th>Tên sản phẩm</th>

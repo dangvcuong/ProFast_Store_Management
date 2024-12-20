@@ -249,7 +249,7 @@ const ProductManagement = () => {
     return (
         <div className="body">
             <h1>Quản lý sản phẩm</h1>
-            <div style={{ display: 'flex', gap: '200px' }}>
+            <div className='all' >
                 <div style={{ flex: 1 }}>
 
 
@@ -405,8 +405,8 @@ const ProductManagement = () => {
 
 
                 </div>
-                <div className="loc-sp" style={{ flex: 1 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '20px', }}>
+                <div style={{ flex: 1 }}>
+                    <div className="loc-sp" style={{ display: 'flex', alignItems: 'start', gap: '20px', }}>
                         <div style={{}}>
                             <h3>Lọc sản phẩm theo hãng</h3>
                             <select
@@ -457,7 +457,7 @@ const ProductManagement = () => {
                                 <img
                                     src={products[key].imageUrl}
                                     alt="Product"
-                                    style={{ width: '100px', height: '100px' }}
+                                    
                                     onError={(e) => e.target.src = "https://via.placeholder.com/50"}
                                 />
                             </td>

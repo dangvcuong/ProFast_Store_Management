@@ -211,12 +211,20 @@ table tbody tr {
 .toggle-btn:hover {
     color: #0056b3;
 }
+.all{
+    display: flex;
+    gap: 50px;
+}
 
 
 .product-description {
     font-size: 14px;
     color: #333;
     line-height: 1.5;
+}
+.table-container img {
+    width: 100px; /* Kích thước mặc định */
+    height: 100px; /* Kích thước mặc định */
 }
 /* Thu nhỏ toàn bộ ở màn hình 1280px */
 @media (max-width: 1280px) {
@@ -227,10 +235,28 @@ table tbody tr {
     .table-container th:first-child{
         width: 10%; 
     }
-    .loc-sp{
-        margin-right: 100px;
+    .all{
+        display: flex;
+        gap: 100px;
     }
-
+    .loc-sp {
+        display: flex;
+        flex-direction: column; /* Xếp theo chiều dọc */
+        gap: 20px; /* Khoảng cách giữa các phần tử */
+        flex: 1;
+    }
+    
+    
+    .loc-sp h3 {
+        margin: 0; /* Bỏ margin cho tiêu đề */
+    }
+    
+    .loc-sp select,
+    .loc-sp input {
+        width: 100%; /* Chiều rộng 100% cho select và input */
+        padding: 8px; /* Padding cho các trường nhập */
+        font-size: 16px; /* Kích thước font */
+    }
     .container {
         max-width: 1100px;
         padding: 15px;
@@ -249,6 +275,14 @@ table tbody tr {
         font-size: 12px; /* Giảm kích thước văn bản trong bảng */
         padding: 8px;
     }
+    .table-container img {
+        width: 70px; /* Kích thước mới cho ảnh ở màn 960px */
+        height: 70px; /* Kích thước mới cho ảnh ở màn 960px */
+    }
+    .table-container button {
+        width: 80px; /* Kích thước mới cho ảnh ở màn 960px */
+         /* Kích thước mới cho ảnh ở màn 960px */
+    }
 
     .product-item {
         padding: 8px;
@@ -266,10 +300,14 @@ table tbody tr {
     body {
         font-size: 12px; /* Giảm kích thước font hơn nữa */
     }
-    .loc-sp{
-        margin-right: 100px;
+    .table-container img {
+        width: 70px; /* Kích thước mới cho ảnh ở màn 960px */
+        height: 70px; /* Kích thước mới cho ảnh ở màn 960px */
     }
-
+    .all{
+        display: flex;
+        gap: 40px;
+    }
     .container {
         max-width: 90%;
         padding: 10px;
